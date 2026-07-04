@@ -123,15 +123,32 @@ function AddExpenseModal({
 
     return (
 
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex justify-center items-center p-4">
 
-            <div className="bg-white rounded-xl shadow-xl p-8 w-[500px]">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8">
 
-                <h2 className="text-2xl font-bold mb-6">
+               <div className="flex justify-between items-center mb-6">
 
-                    Add Expense
+    <div>
 
-                </h2>
+        <h2 className="text-2xl font-bold">
+            💸 Add Expense
+        </h2>
+
+        <p className="text-gray-500 text-sm mt-1">
+            Record a new expense for this group.
+        </p>
+
+    </div>
+
+    <button
+        onClick={onClose}
+        className="text-2xl text-gray-500 hover:text-red-500 transition"
+    >
+        ✕
+    </button>
+
+</div>
 
                 <input
 
@@ -143,7 +160,7 @@ function AddExpenseModal({
 
                     onChange={(e) => setDescription(e.target.value)}
 
-                    className="border rounded w-full p-3 mb-4"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
 
                 />
 
@@ -157,7 +174,7 @@ function AddExpenseModal({
 
                     onChange={(e) => setAmount(e.target.value)}
 
-                    className="border rounded w-full p-3 mb-4"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
 
                 />
 
@@ -167,7 +184,7 @@ function AddExpenseModal({
 
                     onChange={(e) => setSplitType(e.target.value)}
 
-                    className="border rounded w-full p-3 mb-5"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
 
                 >
 
@@ -202,12 +219,9 @@ function AddExpenseModal({
                                 members.map((member) => (
 
                                     <div
-
-                                        key={member.userId}
-
-                                        className="flex justify-between items-center mb-3"
-
-                                    >
+    key={member.userId}
+    className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4"
+>
 
                                         <span>
 
@@ -221,7 +235,7 @@ function AddExpenseModal({
 
                                             placeholder="Amount"
 
-                                            className="border rounded p-2 w-40"
+                                            className="w-full md:w-44 border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
 
                                             onChange={(e) =>
 
@@ -249,13 +263,13 @@ function AddExpenseModal({
 
                 }
 
-                <div className="flex justify-end gap-3">
+                <div className="flex flex-col-reverse md:flex-row justify-end gap-3 mt-8">
 
                     <button
 
                         onClick={onClose}
 
-                        className="bg-gray-500 text-white px-5 py-2 rounded hover:bg-gray-600"
+                        className="w-full md:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-3 rounded-xl transition"
 
                     >
 
@@ -269,7 +283,7 @@ function AddExpenseModal({
 
                         disabled={loading}
 
-                        className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700"
+                       className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl transition disabled:opacity-50"
 
                     >
 

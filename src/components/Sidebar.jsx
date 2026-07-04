@@ -29,7 +29,7 @@ function Sidebar() {
 
     return (
 
-        <div className="w-64 bg-gray-900 text-white min-h-screen p-6 shadow-xl">
+       <div className="w-64 h-screen bg-gray-900 text-white p-6 shadow-xl overflow-y-auto">
 
             <h2 className="text-3xl font-bold mb-10 text-center">
 

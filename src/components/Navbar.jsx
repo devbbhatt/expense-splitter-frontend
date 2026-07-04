@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import { Menu, X } from "lucide-react";
 import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import api from "../services/api";
 
-function Navbar() {
+function Navbar({ sidebarOpen, setSidebarOpen }) {
 
     const navigate = useNavigate();
 
@@ -46,23 +47,30 @@ function Navbar() {
 
     return (
 
-        <nav className="bg-blue-600 text-white flex justify-between items-center px-8 py-4 shadow-md">
+        <nav className="bg-blue-600 text-white flex justify-between items-center px-4 md:px-8 py-4 shadow-md">
 
-            <div>
+            <button
+    className="md:hidden mr-4"
+    onClick={() => setSidebarOpen(!sidebarOpen)}
+>
+    {sidebarOpen ? <X size={28} /> : <Menu size={28} />}
+</button>
 
-                <h1 className="text-2xl font-bold">
+            <div className="flex-1">
+
+                <h1 className="text-lg md:text-2xl font-bold">
                     Expense Splitter
                 </h1>
 
-                <p className="text-blue-100 text-sm">
+                <p className="hidden md:block text-blue-100 text-sm">
                     Split expenses with your friends
                 </p>
 
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4">
 
-    <div className="text-right">
+    <div className="hidden sm:block text-right">
 
         <p className="font-semibold">
             👤 {user?.name}
@@ -76,7 +84,7 @@ function Navbar() {
 
     <button
         onClick={logout}
-        className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg font-semibold"
+        className="bg-red-500 hover:bg-red-600 px-3 md:px-4 py-2 rounded-lg font-semibold text-sm md:text-base"
     >
         Logout
     </button>

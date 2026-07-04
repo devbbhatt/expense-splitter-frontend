@@ -75,19 +75,36 @@ function AddMemberModal({ groupId, members, onClose, onMemberAdded }) {
 
     return (
 
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center">
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex justify-center items-center p-4">
 
-            <div className="bg-white rounded-xl p-6 w-96">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 md:p-8">
 
-                <h2 className="text-2xl font-bold mb-5">
+               <div className="flex justify-between items-center mb-6">
 
-                    Add Member
+    <div>
 
-                </h2>
+        <h2 className="text-2xl font-bold">
+            👥 Add Member
+        </h2>
+
+        <p className="text-gray-500 text-sm mt-1">
+            Select a user to add to this group.
+        </p>
+
+    </div>
+
+    <button
+        onClick={onClose}
+        className="text-2xl text-gray-500 hover:text-red-500 transition"
+    >
+        ✕
+    </button>
+
+</div>
 
                 <select
 
-                    className="w-full border p-3 rounded"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
 
                     value={selectedUser}
 
@@ -118,13 +135,13 @@ function AddMemberModal({ groupId, members, onClose, onMemberAdded }) {
 
                 </select>
 
-                <div className="flex justify-end mt-6 gap-3">
+                <div className="flex flex-col-reverse md:flex-row justify-end gap-3 mt-8">
 
                     <button
 
                         onClick={onClose}
 
-                        className="px-4 py-2 rounded bg-gray-300"
+                       className="w-full md:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-3 rounded-xl transition"
 
                     >
 
@@ -136,7 +153,7 @@ function AddMemberModal({ groupId, members, onClose, onMemberAdded }) {
 
                         onClick={addMember}
 
-                        className="px-4 py-2 rounded bg-blue-600 text-white"
+                        className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl transition"
 
                     >
 

@@ -9,8 +9,7 @@ import { toast } from "react-toastify";
 
 import api from "../services/api";
 
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
+import Layout from "../components/Layout";
 import Loading from "../components/Loading";
 import GroupInfo from "../components/GroupInfo";
 
@@ -218,83 +217,66 @@ const refreshData = () => {
 };
 
 
+return (
 
-    return (
+    <Layout>
 
-        <div>
+        <div className="bg-gray-100 min-h-screen">
 
-            <Navbar />
+                   <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
 
-            <div className="flex">
+    <button
+        onClick={() => navigate("/dashboard")}
+        className="w-full md:w-auto bg-gray-700 hover:bg-gray-800 text-white px-5 py-3 rounded-xl"
+    >
+        ← Back to Dashboard
+    </button>
 
-                <Sidebar />
+    <button
+        onClick={() => setShowExpenseModal(true)}
+        className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl"
+    >
+        + Add Expense
+    </button>
 
-                <div className="flex-1 bg-gray-100 min-h-screen p-10">
+</div>
+                    {loading ? (
+    <Loading />
+) : (
+    <>
+        <GroupInfo
+            group={group}
+            isCreator={
+                Number(localStorage.getItem("userId")) === group.createdBy.id
+            }
+            onDeleteGroup={deleteGroup}
+        />
 
-                    <button
-                        onClick={() => navigate("/dashboard")}
-                        className="mb-6 bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
-                    >
-                        ← Back
-                    </button>
-                    <button
+        <MemberTable
+            members={members}
+            onAddMember={() => setShowAddMemberModal(true)}
+            onRemoveMember={removeMember}
+            isCreator={
+                Number(localStorage.getItem("userId")) === group.createdBy.id
+            }
+            creatorId={group.createdBy.id}
+        />
 
-    onClick={() => setShowExpenseModal(true)}
+        <ExpenseTable
+            expenses={expenses}
+            onExpenseDeleted={refreshData}
+        />
 
-    className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 mb-6 ml-3"
+        <BalanceTable balances={balances} />
 
->
-
-    + Add Expense
-
-</button>
-                    {
-
-                        loading ?
-
-                        <Loading />
-
-                    :
-
-                            <>
-
-                        <GroupInfo
-    group={group}
-    isCreator={
-        Number(localStorage.getItem("userId")) === group.createdBy.id
-    }
-    onDeleteGroup={deleteGroup}
-/>
-
-              <MemberTable
-    members={members}
-    onAddMember={() => setShowAddMemberModal(true)}
-    onRemoveMember={removeMember}
-    isCreator={
-        Number(localStorage.getItem("userId")) === group.createdBy.id
-    }
-    creatorId={group.createdBy.id}
-/>
-
-                        <ExpenseTable
-                            expenses={expenses}
-                            onExpenseDeleted={refreshData}
-                        />
-                        <BalanceTable balances={balances} />
-
-                        <SettlementTable settlements={settlements} />
-
+        <SettlementTable settlements={settlements} />
     </>
+)}
 
-                    }
+               </div>
 
-                </div>
-
-            </div>
-
-            {
-
-showExpenseModal && (
+{
+    showExpenseModal && (
 
 <AddExpenseModal
     groupId={id}
@@ -322,9 +304,12 @@ showExpenseModal && (
     )
 }
 
-        </div>
+       
+       
 
-    );
+      </Layout>
+
+);
 
 }
 

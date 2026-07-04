@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 
 import api from "../services/api";
 
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
+import Layout from "../components/Layout";
 import Loading from "../components/Loading";
 import GroupCard from "../components/GroupCard";
 import CreateGroupModal from "../components/CreateGroupModal";
@@ -47,21 +46,15 @@ function Dashboard() {
 
     return (
 
-        <div>
+       <Layout>
 
-            <Navbar />
+    <div className="bg-gray-100 min-h-screen">
 
-            <div className="flex">
-
-                <Sidebar />
-
-                <div className="flex-1 bg-gray-100 min-h-screen p-10">
-
-                    <div className="flex justify-between items-center">
+    <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
 
                         <div>
 
-                            <h1 className="text-4xl font-bold">
+                            <h1 className="text-3xl md:text-4xl font-bold">
                                     Welcome 👋
                             </h1>
 
@@ -69,7 +62,7 @@ function Dashboard() {
                                 Manage your expense groups.
                         </p>
 
-                        <div className="mt-6 bg-white rounded-2xl shadow-lg p-6 w-64">
+                        <div className="mt-6 bg-white rounded-2xl shadow-lg p-6 w-full md:w-64">
 
                         <h2 className="text-lg text-gray-500">
                                 Total Groups
@@ -86,7 +79,7 @@ function Dashboard() {
 
                         <button
                             onClick={() => setShowModal(true)}
-                            className="bg-blue-600 text-white px-5 py-3 rounded-lg hover:bg-blue-700"
+                            className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-lg"
                         >
                             + Create Group
                         </button>
@@ -136,13 +129,10 @@ function Dashboard() {
                         }
 
                     </div>
+    </div>
 
-                </div>
-
-            </div>
-
-            {
-                showModal && (
+    {
+        showModal && (
 
                     <CreateGroupModal
 
@@ -155,7 +145,7 @@ function Dashboard() {
                 )
             }
 
-        </div>
+        </Layout>
 
     );
 

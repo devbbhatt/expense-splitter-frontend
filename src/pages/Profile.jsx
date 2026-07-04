@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
+import Layout from "../components/Layout";
 import Loading from "../components/Loading";
 
 import { toast } from "react-toastify";
@@ -42,15 +41,9 @@ function Profile() {
 
     return (
 
-        <div>
+    <Layout>
 
-            <Navbar />
-
-            <div className="flex">
-
-                <Sidebar />
-
-                <div className="flex-1 bg-gray-100 min-h-screen p-10">
+        <div className="bg-gray-100 min-h-screen">
 
                     {
 
@@ -60,60 +53,68 @@ function Profile() {
 
                             :
 
-                            <div className="max-w-xl mx-auto bg-white rounded-2xl shadow-xl p-8">
-
+                          <div className="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-200 p-6 md:p-10">
+                            
                                 <div className="text-center">
 
-                                    <div className="text-6xl">
-                                        👤
-                                    </div>
+                                    <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-4xl font-bold">
 
-                                    <h1 className="text-3xl font-bold mt-4">
-                                        My Profile
-                                    </h1>
+    {user.name.charAt(0).toUpperCase()}
+
+</div>
+
+                                  <h1 className="text-3xl md:text-4xl font-bold mt-5">
+    My Profile
+</h1>
+
+<p className="text-gray-500 mt-2">
+    Manage your account information.
+</p>
 
                                 </div>
 
-                                <div className="mt-8 space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
 
-                                    <div>
+                                    <div className="bg-gray-50 rounded-2xl p-5">
 
-                                        <p className="text-gray-500">
-                                            Name
-                                        </p>
+    <p className="text-gray-500">
+        Name
+    </p>
 
-                                        <p className="text-xl font-semibold">
-                                            {user.name}
-                                        </p>
+    <p className="text-xl font-semibold mt-1">
+        {user.name}
+    </p>
 
-                                    </div>
+</div>
 
-                                    <div>
+                                    <div className="bg-gray-50 rounded-2xl p-5">
 
-                                        <p className="text-gray-500">
-                                            Email
-                                        </p>
+    <p className="text-gray-500">
+        Email
+    </p>
 
-                                        <p className="text-xl font-semibold">
-                                            {user.email}
-                                        </p>
+    <p className="text-xl font-semibold mt-1">
+        {user.email}
+    </p>
 
-                                    </div>
+</div>
 
                                     {
                                         user.createdAt && (
 
-                                            <div>
+                                           
 
-                                                <p className="text-gray-500">
-                                                    Member Since
-                                                </p>
+                                            <div className="bg-gray-50 rounded-2xl p-5">
 
-                                                <p className="text-xl font-semibold">
-                                                    {new Date(user.createdAt).toLocaleDateString()}
-                                                </p>
+    <p className="text-gray-500">
+        Member Since
+    </p>
 
-                                            </div>
+    <p className="text-xl font-semibold mt-1">
+        {new Date(user.createdAt).toLocaleDateString()}
+    </p>
+
+</div>
 
                                         )
                                     }
@@ -122,7 +123,7 @@ function Profile() {
 
                                 <button
                                     disabled
-                                    className="mt-8 w-full bg-gray-400 text-white py-3 rounded-xl cursor-not-allowed"
+                                    className="mt-10 w-full bg-gray-300 text-gray-700 py-3 rounded-2xl cursor-not-allowed font-semibold"
                                 >
                                     Edit Profile (Coming Soon)
                                 </button>
@@ -131,11 +132,9 @@ function Profile() {
 
                     }
 
-                </div>
+                        </div>
 
-            </div>
-
-        </div>
+    </Layout>
 
     );
 

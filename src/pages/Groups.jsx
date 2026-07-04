@@ -3,8 +3,7 @@ import { toast } from "react-toastify";
 
 import api from "../services/api";
 
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
+import Layout from "../components/Layout";
 import Loading from "../components/Loading";
 import GroupCard from "../components/GroupCard";
 
@@ -56,21 +55,14 @@ function Groups() {
 
     return (
 
-        <div>
+    <Layout>
 
-            <Navbar />
+        <div className="bg-gray-100 min-h-screen">
 
-            <div className="flex">
-
-                <Sidebar />
-
-                <div className="flex-1 bg-gray-100 min-h-screen p-10">
-
-                    <div className="flex justify-between items-center">
-
+                  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
                         <div>
 
-                            <h1 className="text-4xl font-bold">
+                            <h1 className="text-3xl md:text-4xl font-bold">
                                 📁 Groups
                             </h1>
 
@@ -80,7 +72,7 @@ function Groups() {
 
                         </div>
 
-                        <div className="bg-white shadow rounded-xl px-6 py-4">
+                        <div className="bg-white shadow rounded-2xl px-6 py-4 w-full md:w-auto">
 
                             <p className="text-gray-500">
                                 Total Groups
@@ -99,7 +91,7 @@ function Groups() {
                         placeholder="🔍 Search Group..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="mt-8 w-full border rounded-xl px-4 py-3"
+                       className="mt-8 w-full border border-gray-300 rounded-2xl px-5 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
 
                     <div className="mt-8">
@@ -118,11 +110,14 @@ function Groups() {
 
                                         filteredGroups.length === 0 ?
 
-                                            <div className="col-span-full bg-white rounded-xl shadow-lg p-10 text-center">
+                                            <div className="col-span-full bg-white rounded-2xl shadow-lg p-12 text-center">
 
                                                 <h2 className="text-2xl font-bold">
                                                     No Groups Found 📂
                                                 </h2>
+                                                <p className="text-gray-500 mt-2">
+                                                        Try another search keyword.
+                                                </p>
 
                                             </div>
 
@@ -145,13 +140,11 @@ function Groups() {
 
                     </div>
 
-                </div>
+                       </div>
 
-            </div>
+    </Layout>
 
-        </div>
-
-    );
+);
 
 }
 
