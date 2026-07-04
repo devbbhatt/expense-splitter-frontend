@@ -3,8 +3,7 @@ import { toast } from "react-toastify";
 
 import api from "../services/api";
 
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
+import Layout from "../components/Layout";
 import Loading from "../components/Loading";
 
 function Balances() {
@@ -47,17 +46,11 @@ function Balances() {
 
     return (
 
-        <div>
+    <Layout>
 
-            <Navbar />
+        <div className="bg-gray-100 min-h-screen">
 
-            <div className="flex">
-
-                <Sidebar />
-
-                <div className="flex-1 bg-gray-100 min-h-screen p-10">
-
-                    <h1 className="text-4xl font-bold">
+                    <h1 className="text-3xl md:text-4xl font-bold">
                         💰 My Balances
                     </h1>
 
@@ -74,7 +67,7 @@ function Balances() {
 
                             <>
 
-                                <div className="mt-8 bg-white rounded-2xl shadow-lg p-6 w-72">
+                                <div className="mt-8 bg-white rounded-2xl shadow-lg p-6 w-full md:w-72">
 
                                     <p className="text-gray-500">
                                         Net Balance
@@ -92,9 +85,9 @@ function Balances() {
 
                                 </div>
 
-                                <div className="mt-8 bg-white rounded-2xl shadow-lg overflow-hidden">
+                               <div className="mt-8 bg-white rounded-2xl shadow-lg overflow-x-auto">
 
-                                    <table className="w-full">
+                                    <table className="min-w-full">
 
                                         <thead className="bg-gray-100">
 
@@ -174,11 +167,9 @@ function Balances() {
 
                     }
 
-                </div>
+                        </div>
 
-            </div>
-
-        </div>
+    </Layout>
 
     );
 
