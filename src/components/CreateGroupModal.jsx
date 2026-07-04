@@ -5,8 +5,11 @@ import { toast } from "react-toastify";
 function CreateGroupModal({ onClose, onGroupCreated }) {
 
     const [name, setName] = useState("");
+const [loading, setLoading] = useState(false);
 
     const handleCreateGroup = async () => {
+
+        if (loading) return;
 
         if (!name.trim()) {
             toast.warning("Please enter group name");
@@ -14,6 +17,8 @@ function CreateGroupModal({ onClose, onGroupCreated }) {
         }
 
         try {
+
+            setLoading(true);
 
             await api.post("/groups", {
                 name
@@ -35,6 +40,11 @@ function CreateGroupModal({ onClose, onGroupCreated }) {
             );
 
         }
+        finally {
+
+    setLoading(false);
+
+}
 
     };
 
@@ -58,12 +68,17 @@ function CreateGroupModal({ onClose, onGroupCreated }) {
 
                     </div>
 
-                    <button
-                        onClick={onClose}
-                        className="text-2xl text-gray-500 hover:text-red-500 transition"
-                    >
-                        ✕
-                    </button>
+                   <button
+    onClick={onClose}
+    disabled={loading}
+    className={`text-2xl transition ${
+        loading
+            ? "text-gray-300 cursor-not-allowed"
+            : "text-gray-500 hover:text-red-500"
+    }`}
+>
+    ✕
+</button>
 
                 </div>
 
@@ -86,18 +101,28 @@ function CreateGroupModal({ onClose, onGroupCreated }) {
                 <div className="flex flex-col-reverse md:flex-row justify-end gap-3 mt-8">
 
                     <button
-                        onClick={onClose}
-                        className="w-full md:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-3 rounded-xl transition"
-                    >
-                        Cancel
-                    </button>
+    onClick={onClose}
+    disabled={loading}
+    className={`w-full md:w-auto px-5 py-3 rounded-xl transition ${
+        loading
+            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+            : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+    }`}
+>
+    Cancel
+</button>
 
-                    <button
-                        onClick={handleCreateGroup}
-                        className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl transition"
-                    >
-                        Create Group
-                    </button>
+                  <button
+    onClick={handleCreateGroup}
+    disabled={loading}
+    className={`px-4 py-2 rounded text-white transition ${
+        loading
+            ? "bg-blue-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700"
+    }`}
+>
+    {loading ? "Creating..." : "Create"}
+</button>
 
                 </div>
 

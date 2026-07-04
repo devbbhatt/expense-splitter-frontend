@@ -10,8 +10,11 @@ function Signup() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const handleSignup = async () => {
+
+        if (loading) return;
 
         if (!name || !email || !password) {
             toast.warning("Please fill all fields");
@@ -19,6 +22,8 @@ function Signup() {
         }
 
         try {
+
+            setLoading(true);
 
             await api.post("/auth/signup", {
                 name,
@@ -38,6 +43,11 @@ function Signup() {
             );
 
         }
+        finally {
+
+    setLoading(false);
+
+}
 
     };
 
@@ -89,14 +99,17 @@ function Signup() {
                         className="w-full border rounded-xl px-4 py-3"
                     />
 
-                    <button
-                        onClick={handleSignup}
-                        className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700"
-                    >
-
-                        Sign Up
-
-                    </button>
+                   <button
+    onClick={handleSignup}
+    disabled={loading}
+    className={`w-full py-3 rounded-xl font-semibold transition ${
+        loading
+            ? "bg-blue-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700 text-white"
+    }`}
+>
+    {loading ? "Creating Account..." : "Sign Up"}
+</button>
 
                 </div>
 

@@ -48,6 +48,7 @@ function AddExpenseModal({
     };
 
     const handleCreateExpense = async () => {
+        if (loading) return;
 
         if (!description.trim()) {
 
@@ -141,52 +142,44 @@ function AddExpenseModal({
 
     </div>
 
-    <button
-        onClick={onClose}
-        className="text-2xl text-gray-500 hover:text-red-500 transition"
-    >
-        ✕
-    </button>
+<button
+    onClick={onClose}
+    disabled={loading}
+    className={`text-2xl transition ${
+        loading
+            ? "text-gray-300 cursor-not-allowed"
+            : "text-gray-500 hover:text-red-500"
+    }`}
+>
+    ✕
+</button>
 
 </div>
 
                 <input
-
-                    type="text"
-
-                    placeholder="Description"
-
-                    value={description}
-
-                    onChange={(e) => setDescription(e.target.value)}
-
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-
-                />
+    type="text"
+    placeholder="Description"
+    value={description}
+    onChange={(e) => setDescription(e.target.value)}
+    disabled={loading}
+    className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+/>
 
                 <input
-
-                    type="number"
-
-                    placeholder="Amount"
-
-                    value={amount}
-
-                    onChange={(e) => setAmount(e.target.value)}
-
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-
-                />
+    type="number"
+    placeholder="Amount"
+    value={amount}
+    onChange={(e) => setAmount(e.target.value)}
+    disabled={loading}
+    className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+/>
 
                 <select
-
-                    value={splitType}
-
-                    onChange={(e) => setSplitType(e.target.value)}
-
-                    className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-
-                >
+    value={splitType}
+    onChange={(e) => setSplitType(e.target.value)}
+    disabled={loading}
+    className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+>
 
                     <option value="EQUAL">
 
@@ -230,26 +223,17 @@ function AddExpenseModal({
                                         </span>
 
                                         <input
-
-                                            type="number"
-
-                                            placeholder="Amount"
-
-                                            className="w-full md:w-44 border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-
-                                            onChange={(e) =>
-
-                                                handleSplitChange(
-
-                                                    member.userId,
-
-                                                    e.target.value
-
-                                                )
-
-                                            }
-
-                                        />
+    type="number"
+    placeholder="Amount"
+    disabled={loading}
+    className="w-full md:w-44 border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    onChange={(e) =>
+        handleSplitChange(
+            member.userId,
+            e.target.value
+        )
+    }
+/>
 
                                     </div>
 
@@ -265,17 +249,17 @@ function AddExpenseModal({
 
                 <div className="flex flex-col-reverse md:flex-row justify-end gap-3 mt-8">
 
-                    <button
-
-                        onClick={onClose}
-
-                        className="w-full md:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-3 rounded-xl transition"
-
-                    >
-
-                        Cancel
-
-                    </button>
+                   <button
+    onClick={onClose}
+    disabled={loading}
+    className={`w-full md:w-auto px-5 py-3 rounded-xl transition ${
+        loading
+            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+            : "bg-gray-200 hover:bg-gray-300 text-gray-800"
+    }`}
+>
+    Cancel
+</button>
 
                     <button
 

@@ -6,6 +6,7 @@ function AddMemberModal({ groupId, members, onClose, onMemberAdded }) {
 
     const [users, setUsers] = useState([]);
     const [selectedUser, setSelectedUser] = useState("");
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
 
@@ -17,6 +18,7 @@ function AddMemberModal({ groupId, members, onClose, onMemberAdded }) {
 
         try {
 
+            
             const response = await api.get("/users?page=0&size=100");
 
             const allUsers = response.data.content;
@@ -40,6 +42,7 @@ function AddMemberModal({ groupId, members, onClose, onMemberAdded }) {
     };
 
     const addMember = async () => {
+        if (loading) return;
 
         if (!selectedUser) {
 
@@ -50,6 +53,7 @@ function AddMemberModal({ groupId, members, onClose, onMemberAdded }) {
         }
 
         try {
+                  setLoading(true);
 
             await api.post(
                 `/groups/${groupId}/members/${selectedUser}`
@@ -70,6 +74,9 @@ function AddMemberModal({ groupId, members, onClose, onMemberAdded }) {
             );
 
         }
+        finally {
+    setLoading(false);
+}
 
     };
 
@@ -93,17 +100,22 @@ function AddMemberModal({ groupId, members, onClose, onMemberAdded }) {
 
     </div>
 
-    <button
-        onClick={onClose}
-        className="text-2xl text-gray-500 hover:text-red-500 transition"
-    >
-        ✕
-    </button>
+   <button
+    onClick={onClose}
+    disabled={loading}
+    className={`text-2xl transition ${
+        loading
+            ? "text-gray-300 cursor-not-allowed"
+            : "text-gray-500 hover:text-red-500"
+    }`}
+>
+    ✕
+</button>
 
 </div>
 
                 <select
-
+                      disabled={loading}
                     className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
 
                     value={selectedUser}
@@ -138,7 +150,7 @@ function AddMemberModal({ groupId, members, onClose, onMemberAdded }) {
                 <div className="flex flex-col-reverse md:flex-row justify-end gap-3 mt-8">
 
                     <button
-
+                        disabled={loading}
                         onClick={onClose}
 
                        className="w-full md:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-3 rounded-xl transition"
@@ -150,16 +162,16 @@ function AddMemberModal({ groupId, members, onClose, onMemberAdded }) {
                     </button>
 
                     <button
-
-                        onClick={addMember}
-
-                        className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl transition"
-
-                    >
-
-                        Add Member
-
-                    </button>
+    onClick={addMember}
+    disabled={loading}
+    className={`px-4 py-2 rounded text-white transition ${
+        loading
+            ? "bg-blue-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700"
+    }`}
+>
+    {loading ? "Adding..." : "Add Member"}
+</button>
 
                 </div>
 

@@ -35,7 +35,10 @@ function GroupDetails() {
 
     const [showExpenseModal, setShowExpenseModal] = useState(false);
 
-    const [showAddMemberModal, setShowAddMemberModal] = useState(false);    
+    const [showAddMemberModal, setShowAddMemberModal] = useState(false);  
+    
+    const [deletingGroup, setDeletingGroup] = useState(false);
+
 
     const loadMembers = async () => {
 
@@ -83,11 +86,15 @@ const removeMember = async (userId) => {
 
 const deleteGroup = async () => {
 
+    if (deletingGroup) return;
+
     if (!window.confirm("Delete this group?")) {
         return;
     }
 
     try {
+
+        setDeletingGroup(true);
 
         await api.delete(`/groups/${id}`);
 
@@ -102,6 +109,10 @@ const deleteGroup = async () => {
         toast.error(
             error.response?.data?.message || "Failed to delete group"
         );
+
+    } finally {
+
+        setDeletingGroup(false);
 
     }
 
@@ -245,12 +256,13 @@ return (
 ) : (
     <>
         <GroupInfo
-            group={group}
-            isCreator={
-                Number(localStorage.getItem("userId")) === group.createdBy.id
-            }
-            onDeleteGroup={deleteGroup}
-        />
+    group={group}
+    isCreator={
+        Number(localStorage.getItem("userId")) === group.createdBy.id
+    }
+    onDeleteGroup={deleteGroup}
+    deletingGroup={deletingGroup}
+/>
 
         <MemberTable
             members={members}

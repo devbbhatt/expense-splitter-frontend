@@ -1,7 +1,8 @@
 function GroupInfo({
     group,
     isCreator,
-    onDeleteGroup
+    onDeleteGroup,
+    deletingGroup
 }) {
 
     return (
@@ -26,11 +27,16 @@ function GroupInfo({
                     isCreator && (
 
                         <button
-                            onClick={onDeleteGroup}
-                            className="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white px-5 py-3 rounded-xl transition"
-                        >
-                            🗑 Delete Group
-                        </button>
+    onClick={onDeleteGroup}
+    disabled={deletingGroup}
+    className="mt-6 bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg disabled:opacity-50"
+>
+    {
+        deletingGroup
+            ? "Deleting..."
+            : "Delete Group"
+    }
+</button>
 
                     )
                 }

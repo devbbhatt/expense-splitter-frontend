@@ -7,46 +7,54 @@ function Login() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
+    
 
-    const handleLogin = async () => {
+   const handleLogin = async () => {
 
-        // Basic Validation
-        if (!email || !password) {
-            toast.warning("Please enter email and password");
-            return;
-        }
-        try {
+    if (loading) return;
 
-           const response = await api.post("/auth/login", {
-    email,
-    password
-});
+    if (!email || !password) {
+        toast.warning("Please enter email and password");
+        return;
+    }
 
-// Save JWT Token
-localStorage.setItem("token", response.data.data);
+    try {
 
-// Current user fetch karo
-const me = await api.get("/users/me");
+        setLoading(true);
 
-// User id save karo
-localStorage.setItem("userId", me.data.id);
+        const response = await api.post("/auth/login", {
+            email,
+            password
+        });
 
-toast.success("Login Successful");
+        localStorage.setItem("token", response.data.data);
 
-navigate("/dashboard");
+        const me = await api.get("/users/me");
 
-        } catch (error) {
+        localStorage.setItem("userId", me.data.id);
 
-            console.error(error);
+        toast.success("Login Successful");
 
-            toast.error(
-                error.response?.data?.message || "Login Failed"
-            );
-        }
+        navigate("/dashboard");
 
-    };
+    } catch (error) {
+
+        console.error(error);
+
+        toast.error(
+            error.response?.data?.message || "Login Failed"
+        );
+
+    } finally {
+
+        setLoading(false);
+
+    }
+
+};
 
     return (
 
@@ -101,11 +109,16 @@ navigate("/dashboard");
                 </div>
 
                 <button
-                    onClick={handleLogin}
-                    className="w-full bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition font-semibold"
-                >
-                    Login
-                </button>
+    onClick={handleLogin}
+    disabled={loading}
+    className={`w-full py-3 rounded-xl font-semibold transition ${
+        loading
+            ? "bg-blue-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700 text-white"
+    }`}
+>
+    {loading ? "Logging in..." : "Login"}
+</button>
 
             </div>
 

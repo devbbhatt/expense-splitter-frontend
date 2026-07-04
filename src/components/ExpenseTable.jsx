@@ -2,31 +2,41 @@ import api from "../services/api";
 
 function ExpenseTable({ expenses, onExpenseDeleted }) {
 
+    const [loadingExpenseId, setLoadingExpenseId] = useState(null);
+
     const handleDelete = async (expenseId) => {
 
-        const confirmDelete = window.confirm(
-            "Are you sure you want to delete this expense?"
-        );
+    if (loadingExpenseId) return;
 
-        if (!confirmDelete) return;
+    const confirmDelete = window.confirm(
+        "Are you sure you want to delete this expense?"
+    );
 
-        try {
+    if (!confirmDelete) return;
 
-            await api.delete(`/expenses/${expenseId}`);
+    try {
 
-            alert("Expense Deleted Successfully");
+        setLoadingExpenseId(expenseId);
 
-            onExpenseDeleted();
+        await api.delete(`/expenses/${expenseId}`);
 
-        } catch (error) {
+        toast.success("Expense Deleted Successfully");
 
-            console.log(error);
+        onExpenseDeleted();
 
-            alert("Failed to delete expense");
+    } catch (error) {
 
-        }
+        console.log(error);
 
-    };
+        toast.error("Failed to delete expense");
+
+    } finally {
+
+        setLoadingExpenseId(null);
+
+    }
+
+};
 
     return (
 
@@ -96,11 +106,16 @@ function ExpenseTable({ expenses, onExpenseDeleted }) {
                                                 <td className="py-4">
 
                                                     <button
-                                                        onClick={() => handleDelete(expense.id)}
-                                                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg"
-                                                    >
-                                                        Delete
-                                                    </button>
+    onClick={() => handleDelete(expense.id)}
+    disabled={loadingExpenseId === expense.id}
+    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700 disabled:opacity-50"
+>
+    {
+        loadingExpenseId === expense.id
+            ? "Deleting..."
+            : "Delete"
+    }
+</button>
 
                                                 </td>
 
