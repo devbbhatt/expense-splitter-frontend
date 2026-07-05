@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { toast } from "react-toastify";
 import api from "../services/api";
 
 function ExpenseTable({ expenses, onExpenseDeleted }) {
@@ -168,13 +170,17 @@ function ExpenseTable({ expenses, onExpenseDeleted }) {
                                             </span>{" "}
                                             {expense.splitType}
                                         </p>
-
-                                        <button
-                                            onClick={() => handleDelete(expense.id)}
-                                            className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg"
-                                        >
-                                            Delete Expense
-                                        </button>
+<button
+    onClick={() => handleDelete(expense.id)}
+    disabled={loadingExpenseId === expense.id}
+    className="w-full mt-4 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg disabled:opacity-50"
+>
+    {
+        loadingExpenseId === expense.id
+            ? "Deleting..."
+            : "Delete Expense"
+    }
+</button>
 
                                     </div>
 

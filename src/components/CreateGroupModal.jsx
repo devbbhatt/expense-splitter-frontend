@@ -20,9 +20,17 @@ const [loading, setLoading] = useState(false);
 
             setLoading(true);
 
-            await api.post("/groups", {
-                name
-            });
+            const response = await api.post("/groups", {
+    name
+});
+
+console.log("Create Group Response:", response.data);
+
+await onGroupCreated();
+
+toast.success("Group Created Successfully");
+
+onClose();
 
             toast.success("Group Created Successfully");
 
