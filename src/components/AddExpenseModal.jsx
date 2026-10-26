@@ -1,300 +1,195 @@
 import { useState } from "react";
 import api from "../services/api";
 import { toast } from "react-toastify";
+import Modal from "./ui/Modal";
+import Input from "./ui/Input";
+import Select from "./ui/Select";
+import Button from "./ui/Button";
 
 function AddExpenseModal({
-
-    groupId,
-    members,
-    onClose,
-    onExpenseCreated
-
+  groupId,
+  members,
+  onClose,
+  onExpenseCreated,
 }) {
-
-    const [description, setDescription] = useState("");
-
-    const [amount, setAmount] = useState("");
-
-    const [splitType, setSplitType] = useState("EQUAL");
-
-    const [loading, setLoading] = useState(false);
-
-    const [splits, setSplits] = useState([]);
-
-    const handleSplitChange = (userId, value) => {
-
-        setSplits((prev) => {
-
-            const filtered = prev.filter(
-                split => split.userId !== userId
-            );
-
-            return [
-
-                ...filtered,
-
-                {
-
-                    userId,
-
-                    amount: Number(value)
-
-                }
-
-            ];
-
-        });
-
-    };
-
-    const handleCreateExpense = async () => {
-        if (loading) return;
-
-        if (!description.trim()) {
-
-            toast.warning("Please enter description");
-
-            return;
-
-        }
-
-        if (!amount || Number(amount) <= 0) {
-
-            toast.warning("Please enter valid amount");
-
-            return;
-
-        }
-
-        if (
-            splitType === "EXACT" &&
-            splits.length !== members.length
-        ) {
-
-            toast.warning("Please enter split amount for every member");
-
-            return;
-
-        }
-
-        try {
-
-            setLoading(true);
-
-            await api.post(
-
-                `/expenses/groups/${groupId}/expenses`,
-
-                {
-
-                    description,
-
-                    amount: Number(amount),
-
-                    splitType,
-
-                    splits
-
-                }
-
-            );
-
-            toast.success("Expense Created Successfully");
-
-            onExpenseCreated();
-
-            onClose();
-
-        } catch (error) {
-
-            console.log(error);
-
-           toast.error(
-                error.response?.data?.message ||
-                "Failed to create expense"
-            );
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
-
-    return (
-
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex justify-center items-center p-4">
-
-            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 md:p-8">
-
-               <div className="flex justify-between items-center mb-6">
-
-    <div>
-
-        <h2 className="text-2xl font-bold">
-            💸 Add Expense
-        </h2>
-
-        <p className="text-gray-500 text-sm mt-1">
-            Record a new expense for this group.
-        </p>
-
-    </div>
-
-<button
-    onClick={onClose}
-    disabled={loading}
-    className={`text-2xl transition ${
-        loading
-            ? "text-gray-300 cursor-not-allowed"
-            : "text-gray-500 hover:text-red-500"
-    }`}
->
-    ✕
-</button>
-
-</div>
-
-                <input
-    type="text"
-    placeholder="Description"
-    value={description}
-    onChange={(e) => setDescription(e.target.value)}
-    disabled={loading}
-    className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-/>
-
-                <input
-    type="number"
-    placeholder="Amount"
-    value={amount}
-    onChange={(e) => setAmount(e.target.value)}
-    disabled={loading}
-    className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-/>
-
-                <select
-    value={splitType}
-    onChange={(e) => setSplitType(e.target.value)}
-    disabled={loading}
-    className="w-full border border-gray-300 rounded-xl px-4 py-3 mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
->
-
-                    <option value="EQUAL">
-
-                        Equal
-
-                    </option>
-
-                    <option value="EXACT">
-
-                        Exact
-
-                    </option>
-
-                </select>
-
-                {
-
-                    splitType === "EXACT" && (
-
-                        <div className="mb-5">
-
-                            <h3 className="font-semibold mb-3">
-
-                                Split Amounts
-
-                            </h3>
-
-                            {
-
-                                members.map((member) => (
-
-                                    <div
-    key={member.userId}
-    className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4"
->
-
-                                        <span>
-
-                                            {member.userName}
-
-                                        </span>
-
-                                        <input
-    type="number"
-    placeholder="Amount"
-    disabled={loading}
-    className="w-full md:w-44 border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-    onChange={(e) =>
-        handleSplitChange(
-            member.userId,
-            e.target.value
-        )
+  const [description, setDescription] = useState("");
+  const [amount, setAmount] = useState("");
+  const [splitType, setSplitType] = useState("EQUAL");
+  const [loading, setLoading] = useState(false);
+  const [splits, setSplits] = useState([]);
+  const [errors, setErrors] = useState({});
+
+  const handleSplitChange = (userId, value) => {
+    setSplits((prev) => {
+      const filtered = prev.filter((split) => split.userId !== userId);
+
+      return [
+        ...filtered,
+        {
+          userId,
+          amount: Number(value),
+        },
+      ];
+    });
+  };
+
+  const handleCreateExpense = async () => {
+    if (loading) return;
+
+    if (!description.trim()) {
+      setErrors((current) => ({
+        ...current,
+        description: "Enter an expense description.",
+      }));
+      toast.warning("Please enter description");
+      return;
     }
-/>
 
-                                    </div>
+    if (!amount || Number(amount) <= 0) {
+      setErrors((current) => ({
+        ...current,
+        amount: "Enter an amount greater than zero.",
+      }));
+      toast.warning("Please enter valid amount");
+      return;
+    }
 
-                                ))
+    if (splitType === "EXACT" && splits.length !== members.length) {
+      const enteredUserIds = new Set(splits.map((split) => split.userId));
+      setErrors((current) => ({
+        ...current,
+        splits: Object.fromEntries(
+          members
+            .filter((member) => !enteredUserIds.has(member.userId))
+            .map((member) => [
+              member.userId,
+              "Enter a split amount for this member.",
+            ])
+        ),
+      }));
+      toast.warning("Please enter split amount for every member");
+      return;
+    }
 
-                            }
+    try {
+      setLoading(true);
 
-                        </div>
+      await api.post(`/expenses/groups/${groupId}/expenses`, {
+        description,
+        amount: Number(amount),
+        splitType,
+        splits,
+      });
 
-                    )
+      toast.success("Expense Created Successfully");
+      onExpenseCreated();
+      onClose();
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        error.response?.data?.message || "Failed to create expense"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                }
+  return (
+    <Modal
+      title="Add expense"
+      description="Record a new expense and split it equally or by exact amounts."
+      onClose={onClose}
+      disableClose={loading}
+      wide
+      footer={
+        <>
+          <Button variant="secondary" onClick={onClose} disabled={loading} className="w-full sm:w-auto">
+            Cancel
+          </Button>
+          <Button onClick={handleCreateExpense} disabled={loading} className="w-full sm:w-auto">
+            {loading ? "Creating..." : "Create expense"}
+          </Button>
+        </>
+      }
+    >
+      <div className="space-y-4">
+        <Input
+          label="Description"
+          id="expense-description"
+          type="text"
+          placeholder="Dinner, groceries, taxi..."
+          error={errors.description}
+          value={description}
+          onChange={(e) => {
+            setDescription(e.target.value);
+            setErrors((current) => ({ ...current, description: "" }));
+          }}
+          disabled={loading}
+        />
 
-                <div className="flex flex-col-reverse md:flex-row justify-end gap-3 mt-8">
+        <Input
+          label="Amount"
+          id="expense-amount"
+          type="number"
+          placeholder="0.00"
+          error={errors.amount}
+          value={amount}
+          onChange={(e) => {
+            setAmount(e.target.value);
+            setErrors((current) => ({ ...current, amount: "" }));
+          }}
+          disabled={loading}
+        />
 
-                   <button
-    onClick={onClose}
-    disabled={loading}
-    className={`w-full md:w-auto px-5 py-3 rounded-xl transition ${
-        loading
-            ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-            : "bg-gray-200 hover:bg-gray-300 text-gray-800"
-    }`}
->
-    Cancel
-</button>
+        <Select
+          label="Split type"
+          id="split-type"
+          value={splitType}
+          onChange={(e) => setSplitType(e.target.value)}
+          disabled={loading}
+        >
+          <option value="EQUAL">Equal</option>
+          <option value="EXACT">Exact</option>
+        </Select>
 
-                    <button
-
-                        onClick={handleCreateExpense}
-
-                        disabled={loading}
-
-                       className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl transition disabled:opacity-50"
-
-                    >
-
-                        {
-
-                            loading
-
-                                ?
-
-                                "Creating..."
-
-                                :
-
-                                "Create Expense"
-
-                        }
-
-                    </button>
-
+        {splitType === "EXACT" && (
+          <div>
+            <h3 className="mb-3 text-sm font-medium text-ink">Split amounts</h3>
+            <div className="space-y-3">
+              {members.map((member) => (
+                <div
+                  key={member.userId}
+                  className="flex flex-col gap-2 rounded-xl border border-line p-3 md:flex-row md:items-center md:justify-between"
+                >
+                  <span className="text-sm font-medium text-ink">
+                    {member.userName}
+                  </span>
+                  <Input
+                    type="number"
+                    placeholder="Amount"
+                    error={errors.splits?.[member.userId]}
+                    disabled={loading}
+                    className="md:w-44"
+                    onChange={(e) => {
+                      handleSplitChange(member.userId, e.target.value);
+                      setErrors((current) => ({
+                        ...current,
+                        splits: {
+                          ...current.splits,
+                          [member.userId]: "",
+                        },
+                      }));
+                    }}
+                    aria-label={`Split amount for ${member.userName}`}
+                  />
                 </div>
-
+              ))}
             </div>
-
-        </div>
-
-    );
-
+          </div>
+        )}
+      </div>
+    </Modal>
+  );
 }
 
 export default AddExpenseModal;

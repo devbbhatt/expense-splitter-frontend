@@ -1,146 +1,120 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import api from "../services/api";
 import { toast } from "react-toastify";
+import AuthLayout from "../components/AuthLayout";
+import Input from "../components/ui/Input";
+import Button from "../components/ui/Button";
 
 function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
-
-    const navigate = useNavigate();
-    
-
-   const handleLogin = async () => {
+  const handleLogin = async (event) => {
+    event.preventDefault();
 
     if (loading) return;
 
     if (!email || !password) {
-        toast.warning("Please enter email and password");
-        return;
+      setErrors({
+        email: !email ? "Enter your email address." : "",
+        password: !password ? "Enter your password." : "",
+      });
+      toast.warning("Please enter email and password");
+      return;
     }
 
     try {
+      setLoading(true);
 
-        setLoading(true);
+      const response = await api.post("/auth/login", {
+        email,
+        password,
+      });
 
-        const response = await api.post("/auth/login", {
-            email,
-            password
-        });
+      localStorage.setItem("token", response.data.data);
 
-        localStorage.setItem("token", response.data.data);
+      const me = await api.get("/users/me");
 
-        const me = await api.get("/users/me");
+      localStorage.setItem("userId", me.data.id);
 
-        localStorage.setItem("userId", me.data.id);
-
-        toast.success("Login Successful");
-
-        navigate("/dashboard");
-
+      toast.success("Login Successful");
+      navigate("/dashboard");
     } catch (error) {
-
-        console.error(error);
-
-        toast.error(
-            error.response?.data?.message || "Login Failed"
-        );
-
+      console.error(error);
+      toast.error(error.response?.data?.message || "Login Failed");
     } finally {
-
-        setLoading(false);
-
+      setLoading(false);
     }
+  };
 
-};
+  return (
+    <AuthLayout
+      title="Welcome back"
+      subtitle="Sign in to continue managing your shared expenses."
+      footer={
+        <>
+          Don&apos;t have an account?{" "}
+          <button
+            type="button"
+            onClick={() => navigate("/signup")}
+            className="font-medium text-brand hover:text-brand-hover"
+          >
+            Sign up
+          </button>
+        </>
+      }
+    >
+      <form className="space-y-4" onSubmit={handleLogin}>
+        <Input
+          label="Email"
+          id="login-email"
+          type="email"
+          autoComplete="email"
+          placeholder="Enter email"
+          error={errors.email}
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setErrors((current) => ({ ...current, email: "" }));
+          }}
+        />
 
-    return (
-
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 flex justify-center items-center">
-
-        <div className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md">
-
-            <div className="text-center mb-8">
-
-                <h1 className="text-4xl font-bold text-blue-600">
-                    💰 Expense Splitter
-                </h1>
-
-                <p className="text-gray-500 mt-2">
-                    Welcome Back! Login to continue.
-                </p>
-
-            </div>
-
-            <div className="space-y-5">
-
-                <div>
-
-                    <label className="block text-gray-700 mb-2 font-semibold">
-                        Email
-                    </label>
-
-                    <input
-                        type="email"
-                        placeholder="Enter Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-
-                </div>
-
-                <div>
-
-                    <label className="block text-gray-700 mb-2 font-semibold">
-                        Password
-                    </label>
-
-                    <input
-                        type="password"
-                        placeholder="Enter Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-
-                </div>
-
-                <button
-    onClick={handleLogin}
-    disabled={loading}
-    className={`w-full py-3 rounded-xl font-semibold transition ${
-        loading
-            ? "bg-blue-400 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-700 text-white"
-    }`}
->
-    {loading ? "Logging in..." : "Login"}
-</button>
-
-            </div>
-
-            <p className="text-center text-gray-600 mt-6">
-
-                Don't have an account?{" "}
-
-                <span
-                    onClick={() => navigate("/signup")}
-                    className="text-blue-600 font-semibold cursor-pointer hover:underline"
-                >
-                    Sign Up
-                </span>
-
-            </p>
-
+        <div className="relative">
+          <Input
+            label="Password"
+            id="login-password"
+            type={showPassword ? "text" : "password"}
+            autoComplete="current-password"
+            placeholder="Enter password"
+            error={errors.password}
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setErrors((current) => ({ ...current, password: "" }));
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((current) => !current)}
+            className="absolute right-3 top-9 rounded-md p-1 text-muted hover:text-ink"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
         </div>
 
-    </div>
-
-);
-
+        <Button type="submit" disabled={loading} className="w-full" size="lg">
+          {loading ? "Logging in..." : "Login"}
+        </Button>
+      </form>
+    </AuthLayout>
+  );
 }
 
 export default Login;

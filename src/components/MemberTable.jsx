@@ -1,184 +1,106 @@
+import { Users } from "lucide-react";
+import Button from "./ui/Button";
+import EmptyState from "./ui/EmptyState";
+
 function MemberTable({
-    members,
-    onAddMember,
-    onRemoveMember,
-    isCreator,
-    creatorId
+  members,
+  onAddMember,
+  onRemoveMember,
+  isCreator,
+  creatorId,
 }) {
-
-    return (
-
-        <div className="bg-white rounded-2xl shadow-lg p-6 mt-8">
-
-            <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
-
-                <h2 className="text-2xl font-bold">
-                    👥 Members ({members.length})
-                </h2>
-
-                {
-                    isCreator && (
-
-                        <button
-                            onClick={onAddMember}
-                            className="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl transition"
-                        >
-                            + Add Member
-                        </button>
-
-                    )
-                }
-
-            </div>
-
-            {/* Desktop Table */}
-
-            <div className="hidden md:block overflow-x-auto">
-
-                <table className="w-full">
-
-                    <thead>
-
-                        <tr className="border-b">
-
-                            <th className="text-left py-3">
-                                Name
-                            </th>
-
-                            <th className="text-left py-3">
-                                Email
-                            </th>
-
-                            {
-                                isCreator && (
-
-                                    <th className="text-left py-3">
-                                        Action
-                                    </th>
-
-                                )
-                            }
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        {
-                            members.map((member) => (
-
-                                <tr
-                                    key={member.id}
-                                    className="border-b"
-                                >
-
-                                    <td className="py-4">
-                                        {member.userName}
-                                    </td>
-
-                                    <td className="py-4">
-                                        {member.userEmail}
-                                    </td>
-
-                                    {
-                                        isCreator && (
-
-                                            <td className="py-4">
-
-                                                {
-                                                    member.userId === creatorId ?
-
-                                                        <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
-                                                            Creator
-                                                        </span>
-
-                                                        :
-
-                                                        <button
-                                                            onClick={() => onRemoveMember(member.userId)}
-                                                            className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-lg"
-                                                        >
-                                                            Remove
-                                                        </button>
-
-                                                }
-
-                                            </td>
-
-                                        )
-                                    }
-
-                                </tr>
-
-                            ))
-                        }
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-            {/* Mobile Cards */}
-
-            <div className="md:hidden space-y-4">
-
-                {
-                    members.map((member) => (
-
-                        <div
-                            key={member.id}
-                            className="border rounded-xl p-4 shadow-sm"
-                        >
-
-                            <h3 className="font-semibold text-lg">
-                                👤 {member.userName}
-                            </h3>
-
-                            <p className="text-gray-500 break-all mt-1">
-                                {member.userEmail}
-                            </p>
-
-                            {
-                                isCreator && (
-
-                                    <div className="mt-4">
-
-                                        {
-                                            member.userId === creatorId ?
-
-                                                <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">
-                                                    Creator
-                                                </span>
-
-                                                :
-
-                                                <button
-                                                    onClick={() => onRemoveMember(member.userId)}
-                                                    className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg"
-                                                >
-                                                    Remove Member
-                                                </button>
-
-                                        }
-
-                                    </div>
-
-                                )
-                            }
-
-                        </div>
-
-                    ))
-                }
-
-            </div>
-
+  return (
+    <section className="section-card mt-6 overflow-hidden">
+      <div className="flex flex-col gap-3 border-b border-line px-5 py-4 md:flex-row md:items-center md:justify-between md:px-6">
+        <div>
+          <h2 className="text-base font-semibold text-ink">
+            Members ({members.length})
+          </h2>
+          <p className="mt-0.5 text-sm text-muted">
+            People included in this group's expenses.
+          </p>
         </div>
+        {isCreator && (
+          <Button onClick={onAddMember} className="w-full md:w-auto">
+            Add member
+          </Button>
+        )}
+      </div>
 
-    );
+      {members.length === 0 ? (
+        <EmptyState
+          icon={Users}
+          title="No members yet"
+          description="Add people so expenses can be split."
+        />
+      ) : (
+        <>
+          <div className="hidden overflow-x-auto md:block">
+            <table className="min-w-full">
+              <thead className="table-head">
+                <tr>
+                  <th className="table-cell">Name</th>
+                  <th className="table-cell">Email</th>
+                  {isCreator && <th className="table-cell">Action</th>}
+                </tr>
+              </thead>
+              <tbody>
+                {members.map((member) => (
+                  <tr key={member.id} className="border-t border-line">
+                    <td className="table-cell font-medium">{member.userName}</td>
+                    <td className="table-cell text-muted">{member.userEmail}</td>
+                    {isCreator && (
+                      <td className="table-cell">
+                        {member.userId === creatorId ? (
+                          <span className="rounded-lg bg-brand-soft px-2 py-1 text-xs font-medium text-brand">
+                            Creator
+                          </span>
+                        ) : (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => onRemoveMember(member.userId)}
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
 
+          <div className="space-y-3 p-4 md:hidden">
+            {members.map((member) => (
+              <div key={member.id} className="rounded-xl border border-line p-4">
+                <h3 className="font-semibold text-ink">{member.userName}</h3>
+                <p className="mt-1 break-all text-sm text-muted">{member.userEmail}</p>
+                {isCreator && (
+                  <div className="mt-4">
+                    {member.userId === creatorId ? (
+                      <span className="rounded-lg bg-brand-soft px-2 py-1 text-xs font-medium text-brand">
+                        Creator
+                      </span>
+                    ) : (
+                      <Button
+                        variant="destructive"
+                        className="w-full"
+                        onClick={() => onRemoveMember(member.userId)}
+                      >
+                        Remove member
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </section>
+  );
 }
 
 export default MemberTable;

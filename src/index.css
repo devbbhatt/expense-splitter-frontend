@@ -1,3 +1,80 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-canvas text-ink font-sans;
+    font-feature-settings: "ss01" on;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand/40 ring-offset-2 ring-offset-canvas;
+  }
+
+  ::selection {
+    @apply bg-brand/15 text-ink;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .page-wrap {
+    @apply mx-auto w-full max-w-6xl;
+  }
+
+  .section-card {
+    @apply rounded-2xl border border-line bg-surface shadow-card;
+  }
+
+  .table-head {
+    @apply bg-canvas/80 text-left text-xs font-semibold uppercase tracking-wide text-muted;
+  }
+
+  .table-cell {
+    @apply px-4 py-3.5 text-sm text-ink;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .financial-value {
+    font-variant-numeric: tabular-nums lining-nums;
+    letter-spacing: -0.025em;
+  }
+}
+
+.Toastify__toast {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+  border: 1px solid #E5E7EB;
+}
+
+.Toastify__toast-body {
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,49 +1,91 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Navbar from "./Navbar";
 import Sidebar from "./Sidebar";
+import api from "../services/api";
+import { UserContext } from "../context/UserContext";
 
 function Layout({ children }) {
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
-    return (
-        <div className="min-h-screen bg-gray-100">
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    toast.success("Logged out successfully");
+    setTimeout(() => {
+      navigate("/");
+    }, 800);
+  };
 
-            <Navbar
-                sidebarOpen={sidebarOpen}
-                setSidebarOpen={setSidebarOpen}
-            />
+  useEffect(() => {
+    const loadCurrentUser = async () => {
+      try {
+        const response = await api.get("/users/me");
+        setUser(response.data);
+      } catch (error) {
+        console.log(error);
+      }
+    };
 
-            <div className="flex">
+    loadCurrentUser();
+  }, []);
 
-                {/* Desktop Sidebar */}
-                <div className="hidden md:block">
-                    <Sidebar />
-                </div>
+  useEffect(() => {
+    if (!sidebarOpen) {
+      return undefined;
+    }
 
-                {/* Mobile Sidebar */}
-                {sidebarOpen && (
-                    <>
-                        <div
-                            className="fixed inset-0 bg-black/40 z-40"
-                            onClick={() => setSidebarOpen(false)}
-                        />
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
 
-                        <div className="fixed top-0 left-0 z-50 md:hidden">
-                           <div onClick={() => setSidebarOpen(false)}>
-    <Sidebar />
-</div>
-                        </div>
-                    </>
-                )}
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [sidebarOpen]);
 
-                <main className="flex-1 p-4 md:p-10">
-                    {children}
-                </main>
-
-            </div>
-
+  return (
+    <UserContext.Provider value={{ user, setUser }}>
+      <div className="min-h-screen bg-canvas">
+        <div className="hidden md:fixed md:inset-y-0 md:left-0 md:z-40 md:block">
+          <Sidebar onLogout={logout} />
         </div>
-    );
+
+        {sidebarOpen && (
+          <div className="fixed inset-0 z-50 md:hidden">
+            <button
+              type="button"
+              className="absolute inset-0 bg-ink/40"
+              aria-label="Close navigation"
+              onClick={() => setSidebarOpen(false)}
+            />
+            <div className="relative h-full w-72 max-w-[85vw] shadow-float">
+              <Sidebar
+                onNavigate={() => setSidebarOpen(false)}
+                onLogout={() => {
+                  setSidebarOpen(false);
+                  logout();
+                }}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="md:pl-72">
+          <Navbar
+            sidebarOpen={sidebarOpen}
+            setSidebarOpen={setSidebarOpen}
+            onLogout={logout}
+          />
+          <main className="p-4 pb-10 md:p-8">
+            <div className="page-wrap">{children}</div>
+          </main>
+        </div>
+      </div>
+    </UserContext.Provider>
+  );
 }
 
 export default Layout;

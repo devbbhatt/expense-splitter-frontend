@@ -1,178 +1,160 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-
+import { ArrowDownRight, ArrowUpRight, FolderKanban, Scale } from "lucide-react";
 import api from "../services/api";
-
 import Layout from "../components/Layout";
 import Loading from "../components/Loading";
+import PageHeader from "../components/ui/PageHeader";
+import EmptyState from "../components/ui/EmptyState";
+import { formatCurrency } from "../utils/format";
 
 function Balances() {
+  const [balances, setBalances] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const [balances, setBalances] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const loadBalances = async () => {
+    try {
+      const response = await api.get("/balances/me");
+      setBalances(response.data);
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to load balances");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const loadBalances = async () => {
+  useEffect(() => {
+    loadBalances();
+  }, []);
 
-        try {
+  const totalBalance = balances.reduce((sum, item) => sum + item.balance, 0);
+  const youOwe = balances
+    .filter((item) => item.balance < 0)
+    .reduce((sum, item) => sum + Math.abs(item.balance), 0);
+  const youAreOwed = balances
+    .filter((item) => item.balance > 0)
+    .reduce((sum, item) => sum + item.balance, 0);
 
-            const response = await api.get("/balances/me");
-
-            setBalances(response.data);
-
-        } catch (error) {
-
-            console.log(error);
-
-            toast.error("Failed to load balances");
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
-
-    useEffect(() => {
-
-        loadBalances();
-
-    }, []);
-
-    const totalBalance = balances.reduce(
-        (sum, item) => sum + item.balance,
-        0
-    );
-
-    return (
-
+  return (
     <Layout>
+      <PageHeader
+        title="My balances"
+        description="Balance summary across all your groups."
+      />
 
-        <div className="bg-gray-100 min-h-screen">
+      {loading ? (
+        <Loading label="Loading balances" />
+      ) : (
+        <>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="section-card p-5">
+              <p className="flex items-center gap-2 text-sm text-muted">
+                <Scale size={16} />
+                Net balance
+              </p>
+              <p
+                className={`mt-3 text-2xl font-semibold ${
+                  totalBalance >= 0 ? "text-success" : "text-danger"
+                }`}
+              >
+                {formatCurrency(totalBalance)}
+              </p>
+              <p className="mt-1 text-xs text-muted">
+                {totalBalance >= 0 ? "Overall receivable" : "Overall owed"}
+              </p>
+            </div>
+            <div className="section-card p-5">
+              <p className="flex items-center gap-2 text-sm text-muted">
+                <ArrowDownRight size={16} />
+                You owe
+              </p>
+              <p className="mt-3 text-2xl font-semibold text-danger">
+                {formatCurrency(youOwe)}
+              </p>
+              <p className="mt-1 text-xs text-muted">Negative group balances</p>
+            </div>
+            <div className="section-card p-5">
+              <p className="flex items-center gap-2 text-sm text-muted">
+                <ArrowUpRight size={16} />
+                You are owed
+              </p>
+              <p className="mt-3 text-2xl font-semibold text-success">
+                {formatCurrency(youAreOwed)}
+              </p>
+              <p className="mt-1 text-xs text-muted">Positive group balances</p>
+            </div>
+          </div>
 
-                    <h1 className="text-3xl md:text-4xl font-bold">
-                        💰 My Balances
-                    </h1>
+          <section className="section-card mt-6 overflow-hidden">
+            <div className="border-b border-line px-5 py-4 md:px-6">
+              <h2 className="text-base font-semibold text-ink">Group-wise balances</h2>
+              <p className="mt-0.5 text-sm text-muted">
+                Positive amounts are receivable. Negative amounts are owed.
+              </p>
+            </div>
 
-                    <p className="text-gray-500 mt-2">
-                        Balance summary across all your groups.
-                    </p>
+            {balances.length === 0 ? (
+              <EmptyState
+                icon={FolderKanban}
+                title="No balance found"
+                description="Join or create a group and add expenses to see balances."
+              />
+            ) : (
+              <>
+                <div className="hidden overflow-x-auto md:block">
+                  <table className="min-w-full">
+                    <thead className="table-head">
+                      <tr>
+                        <th className="table-cell">Group</th>
+                        <th className="table-cell">Balance</th>
+                        <th className="table-cell">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {balances.map((item, index) => (
+                        <tr key={index} className="border-t border-line">
+                          <td className="table-cell font-medium">{item.groupName}</td>
+                          <td
+                            className={`table-cell font-semibold ${
+                              item.balance >= 0 ? "text-success" : "text-danger"
+                            }`}
+                          >
+                            {formatCurrency(item.balance)}
+                          </td>
+                          <td className="table-cell text-muted">
+                            {item.balance >= 0 ? "You are owed" : "You owe"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
 
-                    {
-                        loading ?
-
-                            <Loading />
-
-                            :
-
-                            <>
-
-                                <div className="mt-8 bg-white rounded-2xl shadow-lg p-6 w-full md:w-72">
-
-                                    <p className="text-gray-500">
-                                        Net Balance
-                                    </p>
-
-                                    <p
-                                        className={`text-4xl font-bold mt-2 ${
-                                            totalBalance >= 0
-                                                ? "text-green-600"
-                                                : "text-red-600"
-                                        }`}
-                                    >
-                                        ₹ {totalBalance}
-                                    </p>
-
-                                </div>
-
-                               <div className="mt-8 bg-white rounded-2xl shadow-lg overflow-x-auto">
-
-                                    <table className="min-w-full">
-
-                                        <thead className="bg-gray-100">
-
-                                            <tr>
-
-                                                <th className="text-left p-4">
-                                                    Group
-                                                </th>
-
-                                                <th className="text-left p-4">
-                                                    Balance
-                                                </th>
-
-                                            </tr>
-
-                                        </thead>
-
-                                        <tbody>
-
-                                            {
-
-                                                balances.length === 0 ?
-
-                                                    <tr>
-
-                                                        <td
-                                                            colSpan="2"
-                                                            className="text-center py-8 text-gray-500"
-                                                        >
-
-                                                            No Balance Found
-
-                                                        </td>
-
-                                                    </tr>
-
-                                                    :
-
-                                                    balances.map((item, index) => (
-
-                                                        <tr
-                                                            key={index}
-                                                            className="border-t"
-                                                        >
-
-                                                            <td className="p-4">
-
-                                                                📁 {item.groupName}
-
-                                                            </td>
-
-                                                            <td
-                                                                className={`p-4 font-bold ${
-                                                                    item.balance >= 0
-                                                                        ? "text-green-600"
-                                                                        : "text-red-600"
-                                                                }`}
-                                                            >
-
-                                                                ₹ {item.balance}
-
-                                                            </td>
-
-                                                        </tr>
-
-                                                    ))
-
-                                            }
-
-                                        </tbody>
-
-                                    </table>
-
-                                </div>
-
-                            </>
-
-                    }
-
-                        </div>
-
+                <div className="space-y-3 p-4 md:hidden">
+                  {balances.map((item, index) => (
+                    <div key={index} className="rounded-xl border border-line p-4">
+                      <p className="font-medium text-ink">{item.groupName}</p>
+                      <p
+                        className={`mt-2 text-lg font-semibold ${
+                          item.balance >= 0 ? "text-success" : "text-danger"
+                        }`}
+                      >
+                        {formatCurrency(item.balance)}
+                      </p>
+                      <p className="mt-1 text-sm text-muted">
+                        {item.balance >= 0 ? "You are owed" : "You owe"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
+        </>
+      )}
     </Layout>
-
-    );
-
+  );
 }
 
 export default Balances;

@@ -1,328 +1,191 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, Plus } from "lucide-react";
 import MemberTable from "../components/MemberTable";
 import ExpenseTable from "../components/ExpenseTable";
 import BalanceTable from "../components/BalanceTable";
 import SettlementTable from "../components/SettlementTable";
 import AddExpenseModal from "../components/AddExpenseModal";
 import { toast } from "react-toastify";
-
 import api from "../services/api";
-
 import Layout from "../components/Layout";
 import Loading from "../components/Loading";
 import GroupInfo from "../components/GroupInfo";
-
 import AddMemberModal from "../components/AddMemberModal";
+import Button from "../components/ui/Button";
 
 function GroupDetails() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [group, setGroup] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [members, setMembers] = useState([]);
+  const [expenses, setExpenses] = useState([]);
+  const [balances, setBalances] = useState([]);
+  const [settlements, setSettlements] = useState([]);
+  const [showExpenseModal, setShowExpenseModal] = useState(false);
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [deletingGroup, setDeletingGroup] = useState(false);
 
-    const { id } = useParams();
-
-    const navigate = useNavigate();
-
-    const [group, setGroup] = useState(null);
-
-    const [loading, setLoading] = useState(true);
-
-    const [members, setMembers] = useState([]);
-
-    const [expenses, setExpenses] = useState([]);
-
-    const [balances, setBalances] = useState([]);
-
-    const [settlements, setSettlements] = useState([]);
-
-    const [showExpenseModal, setShowExpenseModal] = useState(false);
-
-    const [showAddMemberModal, setShowAddMemberModal] = useState(false);  
-    
-    const [deletingGroup, setDeletingGroup] = useState(false);
-
-
-    const loadMembers = async () => {
-
+  const loadMembers = async () => {
     try {
-
-        const response = await api.get(
-            `/groups/members/${id}?page=0&size=20`
-        );
-
-        setMembers(response.data.content);
-
+      const response = await api.get(`/groups/members/${id}?page=0&size=20`);
+      setMembers(response.data.content);
     } catch (error) {
-
-        console.log(error);
-
+      console.log(error);
     }
+  };
 
-};
-
-const removeMember = async (userId) => {
-
+  const removeMember = async (userId) => {
     if (!window.confirm("Remove this member?")) {
-        return;
+      return;
     }
 
     try {
-
-        await api.delete(`/groups/${id}/members/${userId}`);
-
-        toast.success("Member removed successfully");
-
-        loadMembers();
-
+      await api.delete(`/groups/${id}/members/${userId}`);
+      toast.success("Member removed successfully");
+      loadMembers();
     } catch (error) {
-
-        console.log(error);
-
-        toast.error(
-            error.response?.data?.message || "Failed to remove member"
-        );
-
+      console.log(error);
+      toast.error(error.response?.data?.message || "Failed to remove member");
     }
+  };
 
-};
-
-const deleteGroup = async () => {
-
+  const deleteGroup = async () => {
     if (deletingGroup) return;
 
     if (!window.confirm("Delete this group?")) {
-        return;
+      return;
     }
 
     try {
-
-        setDeletingGroup(true);
-
-        await api.delete(`/groups/${id}`);
-
-        toast.success("Group deleted successfully");
-
-        navigate("/dashboard");
-
+      setDeletingGroup(true);
+      await api.delete(`/groups/${id}`);
+      toast.success("Group deleted successfully");
+      navigate("/dashboard");
     } catch (error) {
-
-        console.log(error);
-
-        toast.error(
-            error.response?.data?.message || "Failed to delete group"
-        );
-
+      console.log(error);
+      toast.error(error.response?.data?.message || "Failed to delete group");
     } finally {
-
-        setDeletingGroup(false);
-
+      setDeletingGroup(false);
     }
+  };
 
-};
-
-    const loadGroup = async () => {
-
+  const loadGroup = async () => {
     try {
-
-        const response = await api.get(`/groups/${id}`);
-
-        console.log("Group Response:", response.data);
-
-        setGroup(response.data);
-
+      const response = await api.get(`/groups/${id}`);
+      console.log("Group Response:", response.data);
+      setGroup(response.data);
     } catch (error) {
-
-        console.log("Group Error:", error.response?.data);
-
-        toast.error(
-            error.response?.data?.message || "Failed to load group"
-        );
-
-        navigate("/dashboard");
-
+      console.log("Group Error:", error.response?.data);
+      toast.error(error.response?.data?.message || "Failed to load group");
+      navigate("/dashboard");
     } finally {
-
-        setLoading(false);
-
+      setLoading(false);
     }
+  };
 
-};
-
-    const loadExpenses = async () => {
-
+  const loadExpenses = async () => {
     try {
-
-        const response = await api.get(
-            `/expenses/groups/${id}/expenses?page=0&size=20`
-        );
-
-        setExpenses(response.data.content);
-
+      const response = await api.get(`/expenses/groups/${id}/expenses?page=0&size=20`);
+      setExpenses(response.data.content);
     } catch (error) {
-
-        console.log(error);
-
+      console.log(error);
     }
+  };
 
-};
-
-const loadBalances = async () => {
-
+  const loadBalances = async () => {
     try {
-
-        const response = await api.get(
-            `/balances/groups/${id}/balances`
-        );
-
-        console.log("Full Response:", response);
-        console.log("Response Data:", response.data);
-        console.log("Is Array:", Array.isArray(response.data));
-
-        setBalances(response.data);
-
+      const response = await api.get(`/balances/groups/${id}/balances`);
+      console.log("Full Response:", response);
+      console.log("Response Data:", response.data);
+      console.log("Is Array:", Array.isArray(response.data));
+      setBalances(response.data);
     } catch (error) {
-
-        console.log(error);
-
+      console.log(error);
     }
+  };
 
-};
-
-const loadSettlements = async () => {
-
+  const loadSettlements = async () => {
     try {
-
-        const response = await api.get(
-            `/balances/groups/${id}/settlements`
-        );
-
-        setSettlements(response.data);
-
+      const response = await api.get(`/balances/groups/${id}/settlements`);
+      setSettlements(response.data);
     } catch (error) {
-
-        console.log(error);
-
+      console.log(error);
     }
+  };
 
-};
-
-
-
-
-    useEffect(() => {
-
+  useEffect(() => {
     loadGroup();
     loadExpenses();
     loadMembers();
     loadBalances();
     loadSettlements();
+  }, []);
 
-}, []);
-
-const refreshData = () => {
-
+  const refreshData = () => {
     loadExpenses();
-
     loadBalances();
-
     loadSettlements();
+  };
 
-};
-
-
-return (
-
+  return (
     <Layout>
+      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <Button variant="secondary" onClick={() => navigate("/dashboard")} className="w-full sm:w-auto">
+          <ArrowLeft size={16} />
+          Back to dashboard
+        </Button>
+        <Button onClick={() => setShowExpenseModal(true)} className="w-full sm:w-auto">
+          <Plus size={16} />
+          Add expense
+        </Button>
+      </div>
 
-        <div className="bg-gray-100 min-h-screen">
+      {loading ? (
+        <Loading label="Loading group" />
+      ) : (
+        <>
+          <GroupInfo
+            group={group}
+            isCreator={Number(localStorage.getItem("userId")) === group.createdBy.id}
+            onDeleteGroup={deleteGroup}
+            deletingGroup={deletingGroup}
+          />
 
-                   <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-8">
-
-    <button
-        onClick={() => navigate("/dashboard")}
-        className="w-full md:w-auto bg-gray-700 hover:bg-gray-800 text-white px-5 py-3 rounded-xl"
-    >
-        ← Back to Dashboard
-    </button>
-
-    <button
-        onClick={() => setShowExpenseModal(true)}
-        className="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white px-5 py-3 rounded-xl"
-    >
-        + Add Expense
-    </button>
-
-</div>
-                    {loading ? (
-    <Loading />
-) : (
-    <>
-        <GroupInfo
-    group={group}
-    isCreator={
-        Number(localStorage.getItem("userId")) === group.createdBy.id
-    }
-    onDeleteGroup={deleteGroup}
-    deletingGroup={deletingGroup}
-/>
-
-        <MemberTable
+          <MemberTable
             members={members}
             onAddMember={() => setShowAddMemberModal(true)}
             onRemoveMember={removeMember}
-            isCreator={
-                Number(localStorage.getItem("userId")) === group.createdBy.id
-            }
+            isCreator={Number(localStorage.getItem("userId")) === group.createdBy.id}
             creatorId={group.createdBy.id}
+          />
+
+          <ExpenseTable expenses={expenses} onExpenseDeleted={refreshData} />
+          <BalanceTable balances={balances} />
+          <SettlementTable settlements={settlements} />
+        </>
+      )}
+
+      {showExpenseModal && (
+        <AddExpenseModal
+          groupId={id}
+          members={members}
+          onClose={() => setShowExpenseModal(false)}
+          onExpenseCreated={refreshData}
         />
+      )}
 
-        <ExpenseTable
-            expenses={expenses}
-            onExpenseDeleted={refreshData}
-        />
-
-        <BalanceTable balances={balances} />
-
-        <SettlementTable settlements={settlements} />
-    </>
-)}
-
-               </div>
-
-{
-    showExpenseModal && (
-
-<AddExpenseModal
-    groupId={id}
-    members={members}
-    onClose={() => setShowExpenseModal(false)}
-    onExpenseCreated={refreshData}
-/>
-
-)
-
-
-
-}
-
-{
-    showAddMemberModal && (
-
+      {showAddMemberModal && (
         <AddMemberModal
-            groupId={id}
-            members={members}
-            onClose={() => setShowAddMemberModal(false)}
-            onMemberAdded={loadMembers}
+          groupId={id}
+          members={members}
+          onClose={() => setShowAddMemberModal(false)}
+          onMemberAdded={loadMembers}
         />
-
-    )
-}
-
-       
-       
-
-      </Layout>
-
-);
-
+      )}
+    </Layout>
+  );
 }
 
 export default GroupDetails;

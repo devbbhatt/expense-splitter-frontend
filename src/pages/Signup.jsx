@@ -1,139 +1,127 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 import { toast } from "react-toastify";
 import api from "../services/api";
+import AuthLayout from "../components/AuthLayout";
+import Input from "../components/ui/Input";
+import Button from "../components/ui/Button";
 
 function Signup() {
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState({});
 
-    const navigate = useNavigate();
+  const handleSignup = async (event) => {
+    event.preventDefault();
 
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [loading, setLoading] = useState(false);
+    if (loading) return;
 
-    const handleSignup = async () => {
+    if (!name || !email || !password) {
+      setErrors({
+        name: !name ? "Enter your full name." : "",
+        email: !email ? "Enter your email address." : "",
+        password: !password ? "Enter a password." : "",
+      });
+      toast.warning("Please fill all fields");
+      return;
+    }
 
-        if (loading) return;
+    try {
+      setLoading(true);
 
-        if (!name || !email || !password) {
-            toast.warning("Please fill all fields");
-            return;
-        }
+      await api.post("/auth/signup", {
+        name,
+        email,
+        password,
+      });
 
-        try {
+      toast.success("Account created successfully");
+      navigate("/");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Signup Failed");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-            setLoading(true);
-
-            await api.post("/auth/signup", {
-                name,
-                email,
-                password
-            });
-
-            toast.success("Account created successfully");
-
-            navigate("/");
-
-        } catch (error) {
-
-            toast.error(
-                error.response?.data?.message ||
-                "Signup Failed"
-            );
-
-        }
-        finally {
-
-    setLoading(false);
-
-}
-
-    };
-
-    return (
-
-        <div className="min-h-screen bg-gradient-to-br from-blue-100 to-blue-300 flex justify-center items-center">
-
-            <div className="bg-white rounded-2xl shadow-2xl p-10 w-full max-w-md">
-
-                <div className="text-center mb-8">
-
-                    <h1 className="text-4xl font-bold text-blue-600">
-
-                        💰 Expense Splitter
-
-                    </h1>
-
-                    <p className="text-gray-500 mt-2">
-
-                        Create your account
-
-                    </p>
-
-                </div>
-
-                <div className="space-y-5">
-
-                    <input
-                        type="text"
-                        placeholder="Full Name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="w-full border rounded-xl px-4 py-3"
-                    />
-
-                    <input
-                        type="email"
-                        placeholder="Email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full border rounded-xl px-4 py-3"
-                    />
-
-                    <input
-                        type="password"
-                        placeholder="Password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full border rounded-xl px-4 py-3"
-                    />
-
-                   <button
-    onClick={handleSignup}
-    disabled={loading}
-    className={`w-full py-3 rounded-xl font-semibold transition ${
-        loading
-            ? "bg-blue-400 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-700 text-white"
-    }`}
->
-    {loading ? "Creating Account..." : "Sign Up"}
-</button>
-
-                </div>
-
-                <p className="text-center mt-6">
-
-                    Already have an account?{" "}
-
-                    <span
-                        className="text-blue-600 cursor-pointer font-semibold"
-                        onClick={() => navigate("/")}
-                    >
-
-                        Login
-
-                    </span>
-
-                </p>
-
-            </div>
-
+  return (
+    <AuthLayout
+      title="Create your account"
+      subtitle="Start splitting expenses with friends and groups."
+      footer={
+        <>
+          Already have an account?{" "}
+          <button
+            type="button"
+            onClick={() => navigate("/")}
+            className="font-medium text-brand hover:text-brand-hover"
+          >
+            Login
+          </button>
+        </>
+      }
+    >
+      <form className="space-y-4" onSubmit={handleSignup}>
+        <Input
+          label="Full name"
+          id="signup-name"
+          type="text"
+          autoComplete="name"
+          placeholder="Full name"
+          error={errors.name}
+          value={name}
+          onChange={(e) => {
+            setName(e.target.value);
+            setErrors((current) => ({ ...current, name: "" }));
+          }}
+        />
+        <Input
+          label="Email"
+          id="signup-email"
+          type="email"
+          autoComplete="email"
+          placeholder="Email"
+          error={errors.email}
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setErrors((current) => ({ ...current, email: "" }));
+          }}
+        />
+        <div className="relative">
+          <Input
+            label="Password"
+            id="signup-password"
+            type={showPassword ? "text" : "password"}
+            autoComplete="new-password"
+            placeholder="Password"
+            error={errors.password}
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setErrors((current) => ({ ...current, password: "" }));
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((current) => !current)}
+            className="absolute right-3 top-9 rounded-md p-1 text-muted hover:text-ink"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+          >
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
         </div>
-
-    );
-
+        <Button type="submit" disabled={loading} className="w-full" size="lg">
+          {loading ? "Creating account..." : "Sign up"}
+        </Button>
+      </form>
+    </AuthLayout>
+  );
 }
 
 export default Signup;

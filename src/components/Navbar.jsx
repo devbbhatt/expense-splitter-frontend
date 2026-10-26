@@ -1,100 +1,49 @@
-import { useNavigate } from "react-router-dom";
-import { Menu, X } from "lucide-react";
-import { toast } from "react-toastify";
-import { useEffect, useState } from "react";
-import api from "../services/api";
+import { LogOut, Menu, X } from "lucide-react";
+import Logo from "./Logo";
+import { useCurrentUser } from "../context/UserContext";
+import Button from "./ui/Button";
 
-function Navbar({ sidebarOpen, setSidebarOpen }) {
+function Navbar({ sidebarOpen, setSidebarOpen, onLogout }) {
+  const { user } = useCurrentUser();
 
-    const navigate = useNavigate();
+  return (
+    <header className="sticky top-0 z-30 border-b border-line bg-surface/95 backdrop-blur">
+      <div className="flex h-16 items-center justify-between gap-3 px-4 md:px-8">
+        <div className="flex min-w-0 items-center gap-3">
+          <button
+            type="button"
+            className="rounded-xl p-2 text-ink hover:bg-canvas md:hidden"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label={sidebarOpen ? "Close navigation" : "Open navigation"}
+          >
+            {sidebarOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+          <div className="md:hidden">
+            <Logo compact />
+          </div>
+          <p className="hidden text-sm text-muted md:block">
+            Split expenses clearly with friends and groups
+          </p>
+        </div>
 
-    const [user, setUser] = useState(null);
-
-    const logout = () => {
-
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-
-    toast.success("Logged out successfully");
-
-    setTimeout(() => {
-        navigate("/");
-    }, 800);
-
-};
-
-    useEffect(() => {
-
-    const loadCurrentUser = async () => {
-
-        try {
-
-            const response = await api.get("/users/me");
-
-            setUser(response.data);
-
-        } catch (error) {
-
-            console.log(error);
-
-        }
-
-    };
-
-    loadCurrentUser();
-
-}, []);
-
-    return (
-
-        <nav className="bg-blue-600 text-white flex justify-between items-center px-4 md:px-8 py-4 shadow-md">
-
-            <button
-    className="md:hidden mr-4"
-    onClick={() => setSidebarOpen(!sidebarOpen)}
->
-    {sidebarOpen ? <X size={28} /> : <Menu size={28} />}
-</button>
-
-            <div className="flex-1">
-
-                <h1 className="text-lg md:text-2xl font-bold">
-                    Expense Splitter
-                </h1>
-
-                <p className="hidden md:block text-blue-100 text-sm">
-                    Split expenses with your friends
-                </p>
-
-            </div>
-
-            <div className="flex items-center gap-2 md:gap-4">
-
-    <div className="hidden sm:block text-right">
-
-        <p className="font-semibold">
-            👤 {user?.name}
-        </p>
-
-        <p className="text-sm text-blue-100">
-            {user?.email}
-        </p>
-
-    </div>
-
-    <button
-        onClick={logout}
-        className="bg-red-500 hover:bg-red-600 px-3 md:px-4 py-2 rounded-lg font-semibold text-sm md:text-base"
-    >
-        Logout
-    </button>
-
-</div>
-
-        </nav>
-
-    );
-
+        <div className="flex items-center gap-3">
+          <div className="hidden text-right sm:block">
+            <p className="text-sm font-medium text-ink">{user?.name}</p>
+            <p className="text-xs text-muted">{user?.email}</p>
+          </div>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onLogout}
+            className="shrink-0"
+          >
+            <LogOut size={14} />
+            Logout
+          </Button>
+        </div>
+      </div>
+    </header>
+  );
 }
 
 export default Navbar;

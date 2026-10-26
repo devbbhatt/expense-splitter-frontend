@@ -1,143 +1,85 @@
 import { useEffect, useState } from "react";
+import { Calendar, Mail, UserRound } from "lucide-react";
 import api from "../services/api";
-
 import Layout from "../components/Layout";
 import Loading from "../components/Loading";
-
+import PageHeader from "../components/ui/PageHeader";
+import Button from "../components/ui/Button";
 import { toast } from "react-toastify";
+import { formatDate, getInitials } from "../utils/format";
 
 function Profile() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    const [user, setUser] = useState(null);
-    const [loading, setLoading] = useState(true);
+  const loadProfile = async () => {
+    try {
+      const response = await api.get("/users/me");
+      setUser(response.data);
+    } catch (error) {
+      console.log(error);
+      toast.error("Failed to load profile");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const loadProfile = async () => {
+  useEffect(() => {
+    loadProfile();
+  }, []);
 
-        try {
-
-            const response = await api.get("/users/me");
-
-            setUser(response.data);
-
-        } catch (error) {
-
-            console.log(error);
-
-            toast.error("Failed to load profile");
-
-        } finally {
-
-            setLoading(false);
-
-        }
-
-    };
-
-    useEffect(() => {
-
-        loadProfile();
-
-    }, []);
-
-    return (
-
+  return (
     <Layout>
+      <PageHeader
+        title="My profile"
+        description="View your account information."
+      />
 
-        <div className="bg-gray-100 min-h-screen">
+      {loading ? (
+        <Loading label="Loading profile" />
+      ) : (
+        <div className="mx-auto max-w-2xl section-card p-6 md:p-8">
+          <div className="flex flex-col items-center text-center">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand text-2xl font-semibold text-white">
+              {getInitials(user.name)}
+            </div>
+            <h2 className="mt-4 text-xl font-semibold text-ink">{user.name}</h2>
+            <p className="mt-1 text-sm text-muted">{user.email}</p>
+          </div>
 
-                    {
+          <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="rounded-xl border border-line bg-canvas p-4">
+              <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted">
+                <UserRound size={14} />
+                Name
+              </p>
+              <p className="mt-1.5 font-medium text-ink">{user.name}</p>
+            </div>
+            <div className="rounded-xl border border-line bg-canvas p-4">
+              <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted">
+                <Mail size={14} />
+                Email
+              </p>
+              <p className="mt-1.5 break-all font-medium text-ink">{user.email}</p>
+            </div>
+            {user.createdAt && (
+              <div className="rounded-xl border border-line bg-canvas p-4 md:col-span-2">
+                <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted">
+                  <Calendar size={14} />
+                  Member since
+                </p>
+                <p className="mt-1.5 font-medium text-ink">{formatDate(user.createdAt)}</p>
+              </div>
+            )}
+          </div>
 
-                        loading ?
-
-                            <Loading />
-
-                            :
-
-                          <div className="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl border border-gray-200 p-6 md:p-10">
-                            
-                                <div className="text-center">
-
-                                    <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-white flex items-center justify-center text-4xl font-bold">
-
-    {user.name.charAt(0).toUpperCase()}
-
-</div>
-
-                                  <h1 className="text-3xl md:text-4xl font-bold mt-5">
-    My Profile
-</h1>
-
-<p className="text-gray-500 mt-2">
-    Manage your account information.
-</p>
-
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
-
-                                    <div className="bg-gray-50 rounded-2xl p-5">
-
-    <p className="text-gray-500">
-        Name
-    </p>
-
-    <p className="text-xl font-semibold mt-1">
-        {user.name}
-    </p>
-
-</div>
-
-                                    <div className="bg-gray-50 rounded-2xl p-5">
-
-    <p className="text-gray-500">
-        Email
-    </p>
-
-    <p className="text-xl font-semibold mt-1">
-        {user.email}
-    </p>
-
-</div>
-
-                                    {
-                                        user.createdAt && (
-
-                                           
-
-                                            <div className="bg-gray-50 rounded-2xl p-5">
-
-    <p className="text-gray-500">
-        Member Since
-    </p>
-
-    <p className="text-xl font-semibold mt-1">
-        {new Date(user.createdAt).toLocaleDateString()}
-    </p>
-
-</div>
-
-                                        )
-                                    }
-
-                                </div>
-
-                                <button
-                                    disabled
-                                    className="mt-10 w-full bg-gray-300 text-gray-700 py-3 rounded-2xl cursor-not-allowed font-semibold"
-                                >
-                                    Edit Profile (Coming Soon)
-                                </button>
-
-                            </div>
-
-                    }
-
-                        </div>
-
+          <Button disabled className="mt-8 w-full" variant="secondary">
+            Edit profile (Coming Soon)
+          </Button>
+        </div>
+      )}
     </Layout>
-
-    );
-
+  );
 }
 
 export default Profile;
