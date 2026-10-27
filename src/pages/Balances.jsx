@@ -6,7 +6,7 @@ import Layout from "../components/Layout";
 import Loading from "../components/Loading";
 import PageHeader from "../components/ui/PageHeader";
 import EmptyState from "../components/ui/EmptyState";
-import { formatCurrency } from "../utils/format";
+import MoneyAmount from "../components/ui/MoneyAmount";
 
 function Balances() {
   const [balances, setBalances] = useState([]);
@@ -53,13 +53,12 @@ function Balances() {
                 <Scale size={16} />
                 Net balance
               </p>
-              <p
+              <MoneyAmount
+                value={totalBalance}
                 className={`mt-3 text-2xl font-semibold ${
                   totalBalance >= 0 ? "text-success" : "text-danger"
                 }`}
-              >
-                {formatCurrency(totalBalance)}
-              </p>
+              />
               <p className="mt-1 text-xs text-muted">
                 {totalBalance >= 0 ? "Overall receivable" : "Overall owed"}
               </p>
@@ -69,9 +68,10 @@ function Balances() {
                 <ArrowDownRight size={16} />
                 You owe
               </p>
-              <p className="mt-3 text-2xl font-semibold text-danger">
-                {formatCurrency(youOwe)}
-              </p>
+              <MoneyAmount
+                value={youOwe}
+                className="mt-3 text-2xl font-semibold text-danger"
+              />
               <p className="mt-1 text-xs text-muted">Negative group balances</p>
             </div>
             <div className="section-card p-5">
@@ -79,9 +79,10 @@ function Balances() {
                 <ArrowUpRight size={16} />
                 You are owed
               </p>
-              <p className="mt-3 text-2xl font-semibold text-success">
-                {formatCurrency(youAreOwed)}
-              </p>
+              <MoneyAmount
+                value={youAreOwed}
+                className="mt-3 text-2xl font-semibold text-success"
+              />
               <p className="mt-1 text-xs text-muted">Positive group balances</p>
             </div>
           </div>
@@ -114,13 +115,13 @@ function Balances() {
                     <tbody>
                       {balances.map((item, index) => (
                         <tr key={index} className="border-t border-line">
-                          <td className="table-cell font-medium">{item.groupName}</td>
+                          <td className="table-cell break-words font-medium">{item.groupName}</td>
                           <td
                             className={`table-cell font-semibold ${
                               item.balance >= 0 ? "text-success" : "text-danger"
                             }`}
                           >
-                            {formatCurrency(item.balance)}
+                            <MoneyAmount value={item.balance} className="font-semibold" />
                           </td>
                           <td className="table-cell text-muted">
                             {item.balance >= 0 ? "You are owed" : "You owe"}
@@ -134,14 +135,13 @@ function Balances() {
                 <div className="space-y-3 p-4 md:hidden">
                   {balances.map((item, index) => (
                     <div key={index} className="rounded-xl border border-line p-4">
-                      <p className="font-medium text-ink">{item.groupName}</p>
-                      <p
+                      <p className="break-words font-medium text-ink">{item.groupName}</p>
+                      <MoneyAmount
+                        value={item.balance}
                         className={`mt-2 text-lg font-semibold ${
                           item.balance >= 0 ? "text-success" : "text-danger"
                         }`}
-                      >
-                        {formatCurrency(item.balance)}
-                      </p>
+                      />
                       <p className="mt-1 text-sm text-muted">
                         {item.balance >= 0 ? "You are owed" : "You owe"}
                       </p>

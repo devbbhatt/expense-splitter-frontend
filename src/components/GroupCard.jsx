@@ -13,7 +13,9 @@ function GroupCard({ group }) {
           <FolderKanban size={19} strokeWidth={1.8} />
         </div>
         <div className="min-w-0">
-          <h2 className="truncate text-base font-semibold text-ink">{group.name}</h2>
+          <h2 className="break-words text-base font-semibold text-ink" title={group.name}>
+            {group.name}
+          </h2>
           <p className="text-sm text-muted">Expense group</p>
         </div>
       </div>
@@ -22,7 +24,9 @@ function GroupCard({ group }) {
         <p className="flex min-w-0 items-center gap-2">
           <UserRound size={16} className="shrink-0 text-muted" aria-hidden="true" />
           <span className="shrink-0 text-muted">Created by</span>
-          <span className="truncate font-medium">{group.createdBy.name}</span>
+          <span className="break-words font-medium" title={group.createdBy.name}>
+            {group.createdBy.name}
+          </span>
         </p>
         <p className="flex items-center gap-2">
           <Calendar size={16} className="shrink-0 text-muted" aria-hidden="true" />

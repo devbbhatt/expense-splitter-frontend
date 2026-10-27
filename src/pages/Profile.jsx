@@ -37,14 +37,18 @@ function Profile() {
 
       {loading ? (
         <Loading label="Loading profile" />
+      ) : !user ? (
+        <div className="section-card p-6 text-sm text-muted" role="alert">
+          Profile information is unavailable. Please try again later.
+        </div>
       ) : (
         <div className="mx-auto max-w-2xl section-card p-6 md:p-8">
           <div className="flex flex-col items-center text-center">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-brand text-2xl font-semibold text-white">
               {getInitials(user.name)}
             </div>
-            <h2 className="mt-4 text-xl font-semibold text-ink">{user.name}</h2>
-            <p className="mt-1 text-sm text-muted">{user.email}</p>
+            <h2 className="mt-4 break-words text-xl font-semibold text-ink">{user.name}</h2>
+            <p className="mt-1 break-all text-sm text-muted">{user.email}</p>
           </div>
 
           <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -53,7 +57,7 @@ function Profile() {
                 <UserRound size={14} />
                 Name
               </p>
-              <p className="mt-1.5 font-medium text-ink">{user.name}</p>
+              <p className="mt-1.5 break-words font-medium text-ink">{user.name}</p>
             </div>
             <div className="rounded-xl border border-line bg-canvas p-4">
               <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-muted">

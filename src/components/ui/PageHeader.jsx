@@ -2,7 +2,7 @@ function PageHeader({ title, description, actions }) {
   return (
     <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
-        <h1 className="text-2xl font-semibold tracking-tight text-ink md:text-[1.75rem]">
+        <h1 className="break-words text-2xl font-semibold tracking-tight text-ink md:text-[1.75rem]">
           {title}
         </h1>
         {description && (
@@ -10,7 +10,7 @@ function PageHeader({ title, description, actions }) {
         )}
       </div>
       {actions && (
-        <div className="flex flex-shrink-0 flex-wrap items-center gap-3">
+        <div className="flex w-full min-w-0 flex-wrap items-center gap-3 sm:w-auto sm:shrink-0">
           {actions}
         </div>
       )}

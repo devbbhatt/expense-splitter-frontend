@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Navbar from "./Navbar";
@@ -9,6 +9,9 @@ import { UserContext } from "../context/UserContext";
 function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const menuButtonRef = useRef(null);
+  const mobileNavigationRef = useRef(null);
+  const wasSidebarOpen = useRef(false);
   const navigate = useNavigate();
 
   const logout = () => {
@@ -35,14 +38,51 @@ function Layout({ children }) {
 
   useEffect(() => {
     if (!sidebarOpen) {
+      if (wasSidebarOpen.current) {
+        menuButtonRef.current?.focus();
+        wasSidebarOpen.current = false;
+      }
+
       return undefined;
     }
 
+    wasSidebarOpen.current = true;
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    mobileNavigationRef.current?.querySelector("a")?.focus();
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setSidebarOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab") {
+        return;
+      }
+
+      const focusableElements = Array.from(
+        mobileNavigationRef.current?.querySelectorAll(
+          'a[href], button:not(:disabled)'
+        ) || []
+      );
+      const first = focusableElements[0];
+      const last = focusableElements[focusableElements.length - 1];
+
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last?.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first?.focus();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
 
     return () => {
       document.body.style.overflow = originalOverflow;
+      window.removeEventListener("keydown", onKeyDown);
     };
   }, [sidebarOpen]);
 
@@ -54,7 +94,11 @@ function Layout({ children }) {
         </div>
 
         {sidebarOpen && (
-          <div className="fixed inset-0 z-50 md:hidden">
+          <div
+            id="mobile-navigation"
+            ref={mobileNavigationRef}
+            className="fixed inset-0 z-50 md:hidden"
+          >
             <button
               type="button"
               className="absolute inset-0 bg-ink/40"
@@ -77,10 +121,11 @@ function Layout({ children }) {
           <Navbar
             sidebarOpen={sidebarOpen}
             setSidebarOpen={setSidebarOpen}
+            menuButtonRef={menuButtonRef}
             onLogout={logout}
           />
-          <main className="p-4 pb-10 md:p-8">
-            <div className="page-wrap">{children}</div>
+          <main className="min-w-0 p-4 pb-10 md:p-8">
+            <div className="page-wrap min-w-0">{children}</div>
           </main>
         </div>
       </div>

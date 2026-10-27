@@ -75,7 +75,7 @@ function MemberTable({
           <div className="space-y-3 p-4 md:hidden">
             {members.map((member) => (
               <div key={member.id} className="rounded-xl border border-line p-4">
-                <h3 className="font-semibold text-ink">{member.userName}</h3>
+                <h3 className="break-words font-semibold text-ink">{member.userName}</h3>
                 <p className="mt-1 break-all text-sm text-muted">{member.userEmail}</p>
                 {isCreator && (
                   <div className="mt-4">

@@ -1,6 +1,6 @@
 import { ArrowDown, ArrowRight, Handshake } from "lucide-react";
 import EmptyState from "./ui/EmptyState";
-import { formatCurrency } from "../utils/format";
+import MoneyAmount from "./ui/MoneyAmount";
 
 function SettlementTable({ settlements = [] }) {
   return (
@@ -34,15 +34,15 @@ function SettlementTable({ settlements = [] }) {
               <tbody>
                 {settlements.map((settlement, index) => (
                   <tr key={index} className="border-t border-line">
-                    <td className="table-cell font-medium">{settlement.fromUserName}</td>
+                    <td className="table-cell break-words font-medium">{settlement.fromUserName}</td>
                     <td className="table-cell">
                       <span className="inline-flex items-center gap-2">
                         <ArrowRight size={14} className="text-muted" />
-                        {settlement.toUserName}
+                        <span className="break-words">{settlement.toUserName}</span>
                       </span>
                     </td>
                     <td className="table-cell font-semibold text-brand">
-                      {formatCurrency(settlement.amount)}
+                      <MoneyAmount value={settlement.amount} className="font-semibold text-brand" />
                     </td>
                   </tr>
                 ))}
@@ -53,15 +53,16 @@ function SettlementTable({ settlements = [] }) {
           <div className="space-y-3 p-4 md:hidden">
             {settlements.map((settlement, index) => (
               <div key={index} className="rounded-xl border border-line p-4">
-                <p className="font-medium text-ink">{settlement.fromUserName}</p>
+                <p className="break-words font-medium text-ink">{settlement.fromUserName}</p>
                 <p className="my-2 flex items-center gap-2 text-sm text-muted">
                   <ArrowDown size={14} />
                   pays
                 </p>
-                <p className="font-medium text-ink">{settlement.toUserName}</p>
-                <p className="mt-3 text-lg font-semibold text-brand">
-                  {formatCurrency(settlement.amount)}
-                </p>
+                <p className="break-words font-medium text-ink">{settlement.toUserName}</p>
+                <MoneyAmount
+                  value={settlement.amount}
+                  className="mt-3 text-lg font-semibold text-brand"
+                />
               </div>
             ))}
           </div>

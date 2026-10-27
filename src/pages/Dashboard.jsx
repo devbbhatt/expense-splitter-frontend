@@ -11,7 +11,7 @@ import Button from "../components/ui/Button";
 import EmptyState from "../components/ui/EmptyState";
 import { toast } from "react-toastify";
 import { useCurrentUser } from "../context/UserContext";
-import { formatCurrency } from "../utils/format";
+import MoneyAmount from "../components/ui/MoneyAmount";
 
 function Dashboard() {
   return (
@@ -102,21 +102,24 @@ function DashboardPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <SummaryCard
             label="Net balance"
-            value={formatCurrency(netBalance)}
+            value={netBalance}
+            currency
             tone={netBalance >= 0 ? "positive" : "negative"}
             icon={Scale}
             hint={netBalance >= 0 ? "Overall receivable" : "Overall owed"}
           />
           <SummaryCard
             label="You owe"
-            value={formatCurrency(youOwe)}
+            value={youOwe}
+            currency
             tone="negative"
             icon={ArrowDownRight}
             hint="Amounts you still need to pay"
           />
           <SummaryCard
             label="You are owed"
-            value={formatCurrency(youAreOwed)}
+            value={youAreOwed}
+            currency
             tone="positive"
             icon={ArrowUpRight}
             hint="Amounts others owe you"
@@ -187,20 +190,19 @@ function DashboardPage() {
           ) : (
             <ul className="divide-y divide-line">
               {balances.map((item, index) => (
-                <li key={index} className="flex items-center justify-between gap-3 px-5 py-3.5">
+                <li key={index} className="flex min-w-0 items-center justify-between gap-3 px-5 py-3.5">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-ink">{item.groupName}</p>
+                    <p className="break-words text-sm font-medium text-ink">{item.groupName}</p>
                     <p className="text-xs text-muted">
                       {item.balance >= 0 ? "You are owed" : "You owe"}
                     </p>
                   </div>
-                  <p
-                    className={`financial-value shrink-0 text-sm font-semibold ${
+                  <MoneyAmount
+                    value={item.balance}
+                    className={`max-w-[65%] text-right text-sm font-semibold ${
                       item.balance >= 0 ? "text-success" : "text-danger"
                     }`}
-                  >
-                    {formatCurrency(item.balance)}
-                  </p>
+                  />
                 </li>
               ))}
             </ul>
@@ -218,7 +220,7 @@ function DashboardPage() {
   );
 }
 
-function SummaryCard({ label, value, hint, icon: Icon, tone }) {
+function SummaryCard({ label, value, hint, icon: Icon, tone, currency = false }) {
   const valueClass =
     tone === "positive"
       ? "text-success"
@@ -234,7 +236,14 @@ function SummaryCard({ label, value, hint, icon: Icon, tone }) {
           <Icon size={17} strokeWidth={1.8} />
         </div>
       </div>
-      <p className={`financial-value mt-4 text-2xl font-semibold ${valueClass}`}>{value}</p>
+      {currency ? (
+        <MoneyAmount
+          value={value}
+          className={`mt-4 text-2xl font-semibold ${valueClass}`}
+        />
+      ) : (
+        <p className={`financial-value mt-4 min-w-0 text-2xl font-semibold ${valueClass}`}>{value}</p>
+      )}
       <p className="mt-1.5 text-xs leading-5 text-muted">{hint}</p>
     </div>
   );

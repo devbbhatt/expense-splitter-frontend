@@ -53,6 +53,7 @@
   .financial-value {
     font-variant-numeric: tabular-nums lining-nums;
     letter-spacing: -0.025em;
+    overflow-wrap: anywhere;
   }
 }
 

@@ -38,7 +38,7 @@ function GroupInfo({
             <UserRound size={14} />
             Created by
           </p>
-          <p className="mt-1.5 font-medium text-ink">{group.createdBy.name}</p>
+          <p className="mt-1.5 break-words font-medium text-ink">{group.createdBy.name}</p>
         </div>
         <div className="rounded-xl border border-line bg-canvas p-4">
           <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted">

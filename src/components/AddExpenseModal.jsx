@@ -161,7 +161,7 @@ function AddExpenseModal({
                   key={member.userId}
                   className="flex flex-col gap-2 rounded-xl border border-line p-3 md:flex-row md:items-center md:justify-between"
                 >
-                  <span className="text-sm font-medium text-ink">
+                  <span className="min-w-0 break-words text-sm font-medium text-ink">
                     {member.userName}
                   </span>
                   <Input

@@ -4,7 +4,7 @@ import { Receipt } from "lucide-react";
 import api from "../services/api";
 import Button from "./ui/Button";
 import EmptyState from "./ui/EmptyState";
-import { formatCurrency } from "../utils/format";
+import MoneyAmount from "./ui/MoneyAmount";
 
 function ExpenseTable({ expenses, onExpenseDeleted }) {
   const [loadingExpenseId, setLoadingExpenseId] = useState(null);
@@ -64,9 +64,9 @@ function ExpenseTable({ expenses, onExpenseDeleted }) {
               <tbody>
                 {expenses.map((expense) => (
                   <tr key={expense.id} className="border-t border-line">
-                    <td className="table-cell font-medium">{expense.description}</td>
+                    <td className="table-cell break-words font-medium">{expense.description}</td>
                     <td className="table-cell font-semibold">
-                      {formatCurrency(expense.amount)}
+                      <MoneyAmount value={expense.amount} className="font-semibold" />
                     </td>
                     <td className="table-cell">{expense.paidBy.name}</td>
                     <td className="table-cell">
@@ -93,13 +93,14 @@ function ExpenseTable({ expenses, onExpenseDeleted }) {
           <div className="space-y-3 p-4 md:hidden">
             {expenses.map((expense) => (
               <div key={expense.id} className="rounded-xl border border-line p-4">
-                <h3 className="font-semibold text-ink">{expense.description}</h3>
+                <h3 className="break-words font-semibold text-ink">{expense.description}</h3>
                 <p className="mt-2 text-sm">
                   <span className="text-muted">Amount:</span>{" "}
-                  <span className="font-semibold">{formatCurrency(expense.amount)}</span>
+                  <MoneyAmount value={expense.amount} className="mt-1 font-semibold" />
                 </p>
                 <p className="mt-1 text-sm">
-                  <span className="text-muted">Paid by:</span> {expense.paidBy.name}
+                  <span className="text-muted">Paid by:</span>{" "}
+                  <span className="break-words">{expense.paidBy.name}</span>
                 </p>
                 <p className="mt-1 text-sm">
                   <span className="text-muted">Split:</span> {expense.splitType}
